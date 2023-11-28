@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: jnhbgvfc
+      POSTGRES_DB: esms
+      POSTGRES_USER: postgres
+    ports:
+      - 5433:5432
+    networks:
+      - postgresql
+    volumes:
+      - postgresql-volume:/postgres
+
+networks:
+  postgresql:
+volumes:
+  postgresql-volume:
