@@ -1,5 +1,6 @@
 package com.penguin.esms.components.staff;
 
+import com.penguin.esms.components.permission.PermissionEntity;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -9,9 +10,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 
 @Getter
@@ -34,13 +38,17 @@ public class StaffEntity extends BaseEntity implements UserDetails {
             @Size(min = 12, max = 12, message = "Citizen ID must be 12 characters long")
     })
     private String citizenId;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<PermissionEntity> permissions = new ArrayList<>();
 
     StaffEntity(){
 
     }
 
-    public StaffEntity(String name, String phone, String password, String email, String citizenId, String role) {
+    public StaffEntity(String name, String phone, String password, String email, String citizenId, Role role) {
         this.name = name;
         this.phone = phone;
         this.password = password;
@@ -57,37 +65,38 @@ public class StaffEntity extends BaseEntity implements UserDetails {
                 ", password='" + password + '\'' +
                 ", email='" + email + '\'' +
                 ", citizenId='" + citizenId + '\'' +
-                ", role='" + role + '\'' +
                 '}';
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>(permissions.stream().map(permissionEntity -> new SimpleGrantedAuthority(permissionEntity.toString())).toList());
+        authorities.add(new SimpleGrantedAuthority(role.name()));
+        return authorities;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return email;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }
