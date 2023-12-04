@@ -16,10 +16,10 @@ public class StaffService {
     private final DTOtoEntityMapper mapper;
 
     public StaffEntity update(StaffDTO staffDTO, String id){
-        if (staffRepository.findById(id).isEmpty())
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Staff not existed");
-        StaffEntity staff = staffRepository.findById(id).get();
+        StaffEntity staff = staffRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Staff not existed"
+                ));
         mapper.updateStaffFromDto(staffDTO, staff);
         return staffRepository.save(staff);
     }
