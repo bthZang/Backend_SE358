@@ -23,4 +23,12 @@ public class StaffService {
         mapper.updateStaffFromDto(staffDTO, staff);
         return staffRepository.save(staff);
     }
+    public void delete(String id){
+        if(staffRepository.findById(id).isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Staff not existed"
+            );
+        }
+        staffRepository.deleteById(id);
+    }
 }

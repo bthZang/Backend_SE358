@@ -24,4 +24,8 @@ public class StaffController {
     public ResponseEntity<?>  edit(@RequestBody StaffDTO staffDTO, @PathVariable String id) {
         return ResponseEntity.ok(staffService.update(staffDTO, id));
     }
+    @DeleteMapping(path = "{id}")
+    public void delete(@PathVariable String id){
+        staffService.delete(id);
+    }
 }
