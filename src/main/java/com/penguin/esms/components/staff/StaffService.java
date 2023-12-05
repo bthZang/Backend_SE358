@@ -5,15 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.security.Principal;
 
 @Service
 @RequiredArgsConstructor
 public class StaffService {
     private final StaffRepository staffRepository;
     private final DTOtoEntityMapper mapper;
+
+    public void getStaffProfile(Principal connectedUser){
+        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken)connectedUser).getPrincipal();
+    }
 
     public StaffEntity update(StaffDTO staffDTO, String id){
         StaffEntity staff = staffRepository.findById(id)
