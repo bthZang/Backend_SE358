@@ -1,6 +1,7 @@
 package com.penguin.esms.components.staff;
 
 import com.penguin.esms.components.permission.PermissionEntity;
+import com.penguin.esms.components.staff.validators.PhoneNumberFormat;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class StaffEntity extends BaseEntity implements UserDetails {
     @Pattern(regexp = "^[a-z0-9A-Z_àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹýÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ ]*$", message = "Name should not contain special characters")
     @NotNull
     private String name;
-    @Size(min = 10, message = "Phone number must be at least 1 characters long")
+    @PhoneNumberFormat(message = "Invalid phone number")
     private String phone;
     @Size(min = 1, message = "Password must be at least 1 characters long")
     private String password;
