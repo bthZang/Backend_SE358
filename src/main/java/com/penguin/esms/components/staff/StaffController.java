@@ -2,10 +2,12 @@ package com.penguin.esms.components.staff;
 
 import com.penguin.esms.components.staff.requests.NewStaffRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
@@ -20,13 +22,20 @@ public class StaffController {
 
     @GetMapping("profile")
     public ResponseEntity<?> getStaffProfile(Principal connectedUser){
-
-        return ResponseEntity.ok(connectedUser);
+        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        return ResponseEntity.ok(staff);
     }
 
     @GetMapping("")
     public ResponseEntity<?> getList(@RequestParam(defaultValue = "") String name) {
         return ResponseEntity.ok(staffService.findByName(name));
+    }
+
+    @GetMapping("{id}")
+    @PreAuthorize("hasAuthority('VIEW_ITEM:STAFF:' + #id) or hasAuthority('VIEW_ALL:STAFF') or hasAuthority('ADMIN')")
+    public ResponseEntity<?> getStaffById(@PathVariable String id) {
+        if (staffRepository.findById(id).isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(staffRepository.findById(id));
     }
 
     @PostMapping("")

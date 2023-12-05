@@ -12,6 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +42,12 @@ public class StaffService {
     }
     public List<StaffEntity> findByName(String name) {
         return staffRepository.findByNameContainingIgnoreCase(name);
+    }
+    public StaffEntity getOne(String id) {
+        Optional<StaffEntity> staff = staffRepository.findById(id);
+        if (staff.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Staff not found");
+        }
+        return staff.get();
     }
 }
