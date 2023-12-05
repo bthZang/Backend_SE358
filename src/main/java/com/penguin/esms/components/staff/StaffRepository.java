@@ -2,6 +2,10 @@ package com.penguin.esms.components.staff;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface StaffRepository extends JpaRepository<StaffEntity, String> {
+import java.util.List;
+import java.util.Optional;
 
+public interface StaffRepository extends JpaRepository<StaffEntity, String> {
+    List<StaffEntity> findByNameContainingIgnoreCase(String name);
+    Optional<StaffEntity> findByEmail(String email);
 }

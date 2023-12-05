@@ -20,10 +20,15 @@ public class StaffController {
 
     @GetMapping("profile")
     public ResponseEntity<?> getStaffProfile(Principal connectedUser){
-        System.out.println(connectedUser.getName());
-        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
-        return ResponseEntity.ok(staff);
+
+        return ResponseEntity.ok(connectedUser);
     }
+
+    @GetMapping("")
+    public ResponseEntity<?> getList(@RequestParam(defaultValue = "") String name) {
+        return ResponseEntity.ok(staffService.findByName(name));
+    }
+
     @PostMapping("")
     @PreAuthorize("hasAuthority('CREATE:STAFF') or hasAuthority('ADMIN')")
     public ResponseEntity<?> createStaff(@RequestBody NewStaffRequest newStaff) {

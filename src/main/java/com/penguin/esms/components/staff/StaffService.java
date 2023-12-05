@@ -11,6 +11,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,5 +38,8 @@ public class StaffService {
             );
         }
         staffRepository.deleteById(id);
+    }
+    public List<StaffEntity> findByName(String name) {
+        return staffRepository.findByNameContainingIgnoreCase(name);
     }
 }
