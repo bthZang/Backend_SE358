@@ -1,5 +1,19 @@
 services:
-web:
+  db:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: jnhbgvfc
+      POSTGRES_DB: esms
+      POSTGRES_USER: postgres
+    ports:
+      - 5432:5432
+    networks:
+      - postgresql
+    volumes:
+      - postgresql-volume:/var/lib/postgres
+
+  web:
     build: .
     ports:
       - 80:8080
