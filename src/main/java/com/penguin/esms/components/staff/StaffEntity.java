@@ -4,6 +4,7 @@ import com.penguin.esms.components.permission.PermissionEntity;
 import com.penguin.esms.components.staff.validators.PhoneNumberFormat;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.validation.constraints.NotNull;
@@ -22,6 +23,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table
 public class StaffEntity extends BaseEntity implements UserDetails {
     @Pattern(regexp = "^[a-z0-9A-Z_àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹýÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ ]*$", message = "Name should not contain special characters")
