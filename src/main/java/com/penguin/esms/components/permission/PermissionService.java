@@ -16,7 +16,6 @@ public class PermissionService {
 
     public PermissionEntity add(PermissionRequest permissionRequest, String staffId) {
         Optional<StaffEntity> staff = staffRepository.findById(staffId);
-        
         PermissionEntity permission = new PermissionEntity();
         permission.setPermissionType(permissionRequest.getPermissionType());
         permission.setEntityType(permissionRequest.getEntityType());
