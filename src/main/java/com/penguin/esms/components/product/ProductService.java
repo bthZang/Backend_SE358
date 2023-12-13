@@ -37,7 +37,7 @@ public class ProductService {
             product.setCategory(category.get());
         }
         return productRepo.save(product);
-
+    }
     public ProductEntity remove(String id) {
         Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
         if (productEntityOptional.isEmpty())
