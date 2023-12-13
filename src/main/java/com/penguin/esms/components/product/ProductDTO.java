@@ -17,7 +17,7 @@ import java.util.List;
 public class ProductDTO {
     @NotNull(message = "name is required")
     private String name;
-    private Long categoryId;
+    private String categoryId;
     private List<String> suppliers = new ArrayList<>();
     private String unit;
     private Long price;

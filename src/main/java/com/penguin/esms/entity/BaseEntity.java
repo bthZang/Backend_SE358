@@ -1,6 +1,12 @@
 package com.penguin.esms.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.penguin.esms.components.staff.StaffEntity;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -10,12 +16,14 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.util.Date;
 
 @MappedSuperclass
+@Getter
+@Setter
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private String id;
 
     @Column(name = "createddate")
     @CreatedDate
@@ -25,39 +33,21 @@ public abstract class BaseEntity {
     @LastModifiedDate
     private Date modifiedDate;
 
-    @Column(name = "createdby")
     @CreatedBy
-    private String createdBy;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="created_by")
+    @JsonIgnoreProperties({"createdBy", "modifiedBy"})
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
+    private StaffEntity createdBy;
 
-    @Column(name = "modifiedby")
     @LastModifiedBy
-    private String modifiedBy;
-
-    public Date getCreatedDate() {
-        return createdDate;
-    }
-    public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
-    }
-    public Date getModifiedDate() {
-        return modifiedDate;
-    }
-    public void setModifiedDate(Date modifiedDate) {
-        this.modifiedDate = modifiedDate;
-    }
-    public String getCreatedBy() {
-        return createdBy;
-    }
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-    public String getModifiedBy() {
-        return modifiedBy;
-    }
-    public void setModifiedBy(String modifiedBy) {
-        this.modifiedBy = modifiedBy;
-    }
-    public Long getId() {
-        return id;
-    }
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="modified_by")
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            property = "id")
+    @JsonIgnoreProperties({"createdBy", "modifiedBy"})
+    private StaffEntity modifiedBy;
 }

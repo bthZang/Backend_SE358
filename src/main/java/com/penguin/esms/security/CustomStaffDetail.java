@@ -11,12 +11,12 @@ import java.util.List;
 public class CustomStaffDetail implements UserDetails {
 
     private static final long serialVersionUID = 1L;
-    private long id;
+    private String id;
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public CustomStaffDetail(long id, String username, String password) {
+    public CustomStaffDetail(String id, String username, String password) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -25,11 +25,11 @@ public class CustomStaffDetail implements UserDetails {
         this.authorities = authorities;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

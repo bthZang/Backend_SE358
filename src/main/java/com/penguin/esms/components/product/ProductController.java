@@ -18,7 +18,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<?> postProduct(@RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(service.add(productDTO));
-
+    }
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable String id) {
         ProductEntity product = service.remove(id);
