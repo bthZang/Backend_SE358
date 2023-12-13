@@ -17,4 +17,11 @@ public class PermissionController {
     public ResponseEntity<?> addPermission(@RequestBody PermissionRequest permissionRequest) {
         return ResponseEntity.ok(permissionService.add(permissionRequest, permissionRequest.getStaffId()));
     }
+
+     @DeleteMapping("{permissionId}")
+    @PreAuthorize("hasAuthority('DELETE_ALL:PERMISSION') or hasAuthority('DELETE_ITEM:PERMISSION:#staffId') or hasAuthority('ADMIN')")
+    public ResponseEntity<?> deletePermission(@PathVariable String permissionId) {
+        permissionService.remove(permissionId);
+        return ResponseEntity.ok().build();
+    }
 }
