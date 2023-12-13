@@ -1,5 +1,6 @@
 package com.penguin.esms.components.staff;
 
+import com.penguin.esms.components.staff.validators.PhoneNumberFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,7 +21,7 @@ public class StaffDTO {
     @Pattern(regexp = "^[a-z0-9A-Z_àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹýÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ ]*$", message = "Name should not contain special characters")
     @NotNull
     private String name;
-    @Size(min = 10, message = "Phone number must be at least 1 characters long")
+    @PhoneNumberFormat(message = "Invalid phone number")
     private String phone;
     @Size(min = 1, message = "Password must be at least 1 characters long")
     private String password;
