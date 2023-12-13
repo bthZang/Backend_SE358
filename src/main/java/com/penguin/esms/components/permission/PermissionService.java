@@ -16,13 +16,11 @@ public class PermissionService {
 
     public PermissionEntity add(PermissionRequest permissionRequest, String staffId) {
         Optional<StaffEntity> staff = staffRepository.findById(staffId);
-
         PermissionEntity permission = new PermissionEntity();
         permission.setPermissionType(permissionRequest.getPermissionType());
         permission.setEntityType(permissionRequest.getEntityType());
         permission.setEntityId(permissionRequest.getEntityId());
         staff.ifPresent(permission::setStaff);
-
         return permissionRepo.save(permission);
     }
 
@@ -31,4 +29,5 @@ public class PermissionService {
         permission.ifPresent(permissionRepo::delete);
         permissionRepo.findById(permissionId);
     }
+
 }
