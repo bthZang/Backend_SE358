@@ -25,6 +25,7 @@ public class PermissionEntity {
     @Enumerated(EnumType.STRING)
     private EntityType entityType;
     private String entityId;
+    
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     @NotNull
