@@ -10,7 +10,6 @@ import com.penguin.esms.utils.JwtProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,24 +22,16 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-    @Autowired
+
     private final StaffRepository repository;
-    @Autowired
     private final TokenRepository tokenRepository;
-    @Autowired
     private final PasswordEncoder passwordEncoder;
-    @Autowired
     private final JwtProvider jwtService;
-    @Autowired
     private final AuthenticationManager authenticationManager;
 
     public AuthenticationResponse register(RegisterRequest request) {
-        var user = StaffEntity.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(request.getRole())
-                .build();
+        var user = new StaffEntity(request.getName(), request.getPhone(), passwordEncoder.encode(request.getPassword()), request.getEmail(), request.getCitizenId(), request.getRole());
+
         var savedUser = repository.save(user);
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
