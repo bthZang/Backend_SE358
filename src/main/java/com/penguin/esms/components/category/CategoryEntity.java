@@ -1,6 +1,5 @@
 package com.penguin.esms.components.category;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.Entity;
@@ -14,8 +13,6 @@ import com.penguin.esms.components.product.ProductEntity;
 
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 @Entity
 @Table
