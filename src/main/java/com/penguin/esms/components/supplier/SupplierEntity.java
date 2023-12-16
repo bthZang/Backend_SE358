@@ -2,7 +2,6 @@ package com.penguin.esms.components.supplier;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.penguin.esms.components.product.ProductEntity;
-import com.penguin.esms.entity.BaseEntity;
 import com.penguin.esms.entity.NoteEntity;
 import jakarta.persistence.*;
 import lombok.*;
