@@ -1,10 +1,12 @@
 package com.penguin.esms.config;
 
 import com.penguin.esms.auditing.ApplicationAuditAware;
+import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.components.staff.StaffRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -20,11 +22,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableJpaAuditing
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final StaffRepository repository;
+
+    private final StaffRepository staffRepository;
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> repository.findByEmail(username)
+        return username -> staffRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
@@ -37,7 +40,7 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public ApplicationAuditAware auditorAware() {
+    public AuditorAware<StaffEntity> auditorAware() {
         return new ApplicationAuditAware();
     }
 
