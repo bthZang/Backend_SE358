@@ -18,4 +18,10 @@ public class CategoryService {
                     HttpStatus.BAD_REQUEST, "Category existed");
         return categoryRepo.save(categoryEntity);
     }
+    public void delete(String id){
+        if (categoryRepo.findById(id).isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Category not existed");
+        categoryRepo.deleteById(id);
+    }
 }
