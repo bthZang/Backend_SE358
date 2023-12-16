@@ -30,4 +30,10 @@ public class SupplierController {
     private final SupplierService service;
     private final PermissionRepo permissionRepo;
 
+
+ @DeleteMapping("{id}")
+    public ResponseEntity<?> delete(@PathVariable String id) {
+        SupplierEntity supplier = service.remove(id);
+        return ResponseEntity.ok().build();
+    }
 }

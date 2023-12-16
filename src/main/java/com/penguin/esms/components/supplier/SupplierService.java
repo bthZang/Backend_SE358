@@ -16,4 +16,13 @@ import java.util.Optional;
 public class SupplierService {
     private final SupplierRepo supplierRepo;
     private final DTOtoEntityMapper mapper;
+
+    public SupplierEntity remove(String id) {
+        Optional<SupplierEntity> optionalSupplier = supplierRepo.findById(id);
+        if (optionalSupplier.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Supplier not found").toString());
+        }
+        supplierRepo.deleteById(id);
+        return optionalSupplier.get();
+    }
 }
