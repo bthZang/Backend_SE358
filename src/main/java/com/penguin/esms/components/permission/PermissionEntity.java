@@ -9,7 +9,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.type.EntityType;
 
 import java.security.Permission;
 import java.util.List;
@@ -19,12 +18,13 @@ import java.util.List;
 @Entity
 @Table
 @RequiredArgsConstructor
-public class PermissionEntity {
+public class PermissionEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PermissionType permissionType;
     @Enumerated(EnumType.STRING)
     private EntityType entityType;
     private String entityId;
+    
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     @NotNull

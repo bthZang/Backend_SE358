@@ -1,4 +1,4 @@
-package com.penguin.esms.components.supplier;
+package com.penguin.esms.components.supplier.dto;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

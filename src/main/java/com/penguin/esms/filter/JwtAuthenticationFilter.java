@@ -21,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Date;
 
 import io.jsonwebtoken.security.SignatureException;
 
@@ -47,6 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         SecurityContextHolder.getContext().setAuthentication(authToken);
 
                         var user = staffRepository.findByEmail(username).orElseThrow();
+                        user.setLastOnline(new Date());
                         staffRepository.save(user);
                     }
                 }
