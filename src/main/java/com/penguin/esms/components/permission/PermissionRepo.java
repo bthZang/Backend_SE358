@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-
 public interface PermissionRepo extends JpaRepository<PermissionEntity,String> {
     Optional<PermissionEntity> findByPermissionTypeAndEntityTypeAndEntityIdAndStaffId(String permissionType, String entityType, String entityId, String staffId);
     Optional<PermissionEntity> findById(String id);
