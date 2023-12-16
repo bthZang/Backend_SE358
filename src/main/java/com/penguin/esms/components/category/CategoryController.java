@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "category")
 @Getter
@@ -14,6 +16,16 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+
+    @GetMapping
+    public List<CategoryEntity> getALl(@RequestParam(defaultValue = "") String name) {
+        return categoryService.getCategory(name);
+    }
+
+    @GetMapping("{id}")
+    public CategoryEntity getItem(@PathVariable String id) {
+        return categoryService.getCategoryById(id);
+    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
