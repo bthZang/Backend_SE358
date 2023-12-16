@@ -1,13 +1,11 @@
 package com.penguin.esms.components.product;
 
-
 import com.penguin.esms.components.category.CategoryEntity;
 import com.penguin.esms.components.category.CategoryRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
 import lombok.RequiredArgsConstructor;
 import com.penguin.esms.entity.Error;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,7 +36,8 @@ public class ProductService {
         }
         return productRepo.save(product);
     }
-    public ProductEntity remove(String id) {
+
+  public ProductEntity remove(String id) {
         Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
         if (productEntityOptional.isEmpty())
             throw new ResponseStatusException(

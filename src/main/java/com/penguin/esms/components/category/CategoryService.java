@@ -17,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepo categoryRepo;
+
     private final DTOtoEntityMapper mapper;
 
     public CategoryEntity postCategory(CategoryEntity categoryEntity) {
@@ -25,6 +26,7 @@ public class CategoryService {
                     HttpStatus.BAD_REQUEST, "Category existed");
         return categoryRepo.save(categoryEntity);
     }
+
 
     public CategoryEntity editCategory(CategoryDTO categoryDTO, String id) {
         CategoryEntity category = categoryRepo.findById(id)

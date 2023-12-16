@@ -21,6 +21,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.postCategory(categoryEntity));
     }
 
+
     @PutMapping(path = "{id}")
     public CategoryEntity edit(CategoryDTO categoryDTO, @PathVariable String id) {
         return categoryService.editCategory(categoryDTO, id);
