@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +19,19 @@ import java.util.Optional;
 public class CategoryService {
     private final CategoryRepo categoryRepo;
     private final DTOtoEntityMapper mapper;
+
+    public CategoryEntity getCategoryById(String id) {
+        Optional<CategoryEntity> categoryEntityOptional = categoryRepo.findById(id);
+        if (categoryEntityOptional.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Category not existed");
+        else {
+            return categoryEntityOptional.get();
+        }
+    }
+    public List<CategoryEntity> getCategory(String name) {
+        return categoryRepo.findByNameContainingIgnoreCase(name);
+    }
 
     public CategoryEntity postCategory(CategoryEntity categoryEntity) {
         if (categoryRepo.findByName(categoryEntity.getName()).isPresent())
