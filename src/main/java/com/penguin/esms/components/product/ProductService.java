@@ -37,6 +37,35 @@ public class ProductService {
         return productRepo.save(product);
     }
 
+public ProductEntity update(ProductDTO productDTO, String id, MultipartFile photo) throws IOException {
+        if (productRepo.findById(id).isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Product not existed");
+        ProductEntity product = updateFromDTO(productDTO, productRepo.findById(id).get());
+        if (photo != null) {
+            List<String> parsedURL = Arrays.stream(product.getPhotoURL().split("/")).toList();
+            amazonS3Service.deleteFile(parsedURL.get(parsedURL.size() - 1));
+            String objectURL = amazonS3Service.updateFile(photo, product.getName() + "_" + photo.getOriginalFilename());
+            product.setPhotoURL(objectURL);
+        }
+        return productRepo.save(product);
+    }
+
+private ProductEntity updateFromDTO(ProductDTO productDTO, ProductEntity product) {
+        mapper.updateProductFromDto(productDTO, product);
+        if (productDTO.getCategoryId() != null) {
+            if (productDTO.getCategoryId().isEmpty()) {
+                product.setCategory(null);
+            } else {
+                Optional<CategoryEntity> category = categoryRepo.findById(productDTO.getCategoryId());
+                if (category.isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("Category not found").toString());
+                }
+                product.setCategory(category.get());
+            }
+        }
+
+
   public ProductEntity remove(String id) {
         Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
         if (productEntityOptional.isEmpty())
