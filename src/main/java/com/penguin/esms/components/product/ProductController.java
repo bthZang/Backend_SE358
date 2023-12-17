@@ -20,6 +20,12 @@ public class ProductController {
     public ResponseEntity<?> postProduct(@RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(service.add(productDTO));
     }
+
+     @PutMapping("{id}")
+    public ResponseEntity<?> putProduct(@RequestParam @Nullable MultipartFile photo, @Valid ProductDTO productDTO, @PathVariable String id) throws IOException {
+        return ResponseEntity.ok(service.update(productDTO, id, photo));
+    }
+
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteProduct(@PathVariable String id) {
         ProductEntity product = service.remove(id);
