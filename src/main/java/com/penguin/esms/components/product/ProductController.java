@@ -16,6 +16,16 @@ public class ProductController {
 
     private final ProductService service;
 
+    @GetMapping
+    public List<ProductEntity> getAl(@RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "") String category) {
+        return service.findByName(name, category);
+    }
+
+    @GetMapping("{id}")
+    public ProductEntity getProduct(@PathVariable String id) {
+        return service.getProduct(id);
+    }
+
     @PostMapping
     public ResponseEntity<?> postProduct(@RequestBody ProductDTO productDTO) {
         return ResponseEntity.ok(service.add(productDTO));
