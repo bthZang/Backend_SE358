@@ -21,6 +21,26 @@ public class ProductService {
     private final CategoryRepo categoryRepo;
     private final DTOtoEntityMapper mapper;
 
+
+    public List<ProductEntity> findByName(String name, String categoryName) {
+            if (categoryName != null && !categoryName.isEmpty()) {
+                Optional<CategoryEntity> optionalCategory = categoryRepo.findByName(categoryName);
+                if (optionalCategory.isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("category not found").toString());
+                }
+                return productRepo.findByNameContainingIgnoreCaseAndCategory(name, optionalCategory.get());
+            }
+            return productRepo.findByNameContainingIgnoreCase(name);
+        }
+
+        public ProductEntity getProduct(String productId) {
+            Optional<ProductEntity> product = productRepo.findById(productId);
+            if (product.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+            }
+            return product.get();
+        }
+
     public ProductEntity add(ProductDTO productDTO) {
         if (productRepo.findByName(productDTO.getName()).isPresent())
             throw new ResponseStatusException(
@@ -65,7 +85,6 @@ private ProductEntity updateFromDTO(ProductDTO productDTO, ProductEntity product
             }
         }
 
-
   public ProductEntity remove(String id) {
         Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
         if (productEntityOptional.isEmpty())
@@ -74,4 +93,5 @@ private ProductEntity updateFromDTO(ProductDTO productDTO, ProductEntity product
         productRepo.deleteById(id);
         return productEntityOptional.get();
     }
+
 }
