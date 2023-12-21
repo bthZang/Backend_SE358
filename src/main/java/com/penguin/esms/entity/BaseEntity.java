@@ -24,7 +24,7 @@ public abstract class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
-
+    private Boolean isStopped = false;
     @Column(name = "createddate")
     @CreatedDate
     private Date createdDate;
