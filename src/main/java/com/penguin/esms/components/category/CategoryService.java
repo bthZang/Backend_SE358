@@ -52,10 +52,12 @@ public class CategoryService {
         return categoryRepo.save(category);
     }
 
-    public void delete(String id){
-        if (categoryRepo.findById(id).isEmpty())
+    public void deleteCategory(String id) {
+        Optional<CategoryEntity> categoryEntityOptional = categoryRepo.findById(id);
+        if (categoryEntityOptional.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Category not existed");
-        categoryRepo.deleteById(id);
+        categoryEntityOptional.get().setIsStopped(true);
+        categoryRepo.save(categoryEntityOptional.get());
     }
 }
