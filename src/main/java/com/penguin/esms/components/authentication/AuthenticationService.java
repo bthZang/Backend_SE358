@@ -1,4 +1,4 @@
-package com.penguin.esms.components.authenticate;
+package com.penguin.esms.components.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.penguin.esms.components.staff.StaffEntity;
@@ -17,7 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Date;
 
 @Service
 @RequiredArgsConstructor

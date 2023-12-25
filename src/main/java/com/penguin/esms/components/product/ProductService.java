@@ -6,11 +6,18 @@ import com.penguin.esms.mapper.DTOtoEntityMapper;
 import lombok.RequiredArgsConstructor;
 import com.penguin.esms.entity.Error;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 @Getter
@@ -72,26 +79,26 @@ public ProductEntity update(ProductDTO productDTO, String id, MultipartFile phot
     }
 
 private ProductEntity updateFromDTO(ProductDTO productDTO, ProductEntity product) {
-        mapper.updateProductFromDto(productDTO, product);
-        if (productDTO.getCategoryId() != null) {
-            if (productDTO.getCategoryId().isEmpty()) {
-                product.setCategory(null);
-            } else {
-                Optional<CategoryEntity> category = categoryRepo.findById(productDTO.getCategoryId());
-                if (category.isEmpty()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("Category not found").toString());
-                }
-                product.setCategory(category.get());
+    mapper.updateProductFromDto(productDTO, product);
+    if (productDTO.getCategoryId() != null) {
+        if (productDTO.getCategoryId().isEmpty()) {
+            product.setCategory(null);
+        } else {
+            Optional<CategoryEntity> category = categoryRepo.findById(productDTO.getCategoryId());
+            if (category.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("Category not found").toString());
             }
+            product.setCategory(category.get());
         }
-
-  public ProductEntity remove(String id) {
+    }
+}
+    public void remove(String id) {
         Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
         if (productEntityOptional.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, new Error("Product not existed").toString());
-        productRepo.deleteById(id);
-        return productEntityOptional.get();
+        productEntityOptional.get().setIsStopped(true);
+        productRepo.save(productEntityOptional.get());
     }
 
 }

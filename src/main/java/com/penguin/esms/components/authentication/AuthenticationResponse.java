@@ -1,4 +1,4 @@
-package com.penguin.esms.components.authenticate;
+package com.penguin.esms.components.authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
