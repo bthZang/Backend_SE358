@@ -1,6 +1,7 @@
 package com.penguin.esms.components.staff;
 
 import com.penguin.esms.components.staff.requests.NewStaffRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,8 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.security.Principal;
-
+import java.sql.SQLException;
+import java.util.List;
 
 @RestController
 @RequestMapping("staff")
@@ -48,7 +51,7 @@ public class StaffController {
         return ResponseEntity.ok(staffService.update(staffDTO, id));
     }
     @DeleteMapping(path = "{id}")
-    public void delete(@PathVariable String id){
-        staffService.delete(id);
+    public void delete(@PathVariable String id) {
+        staffService.remove(id);
     }
 }

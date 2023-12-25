@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +34,16 @@ public class StaffService {
         mapper.updateStaffFromDto(staffDTO, staff);
         return staffRepository.save(staff);
     }
-    public void delete(String id){
-        if(staffRepository.findById(id).isEmpty()) {
+    
+    public void remove(String id) {
+        Optional<StaffEntity> staff = staffRepository.findById(id);
+        if (staff.isEmpty())
             throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "Staff not existed"
-            );
-        }
-        staffRepository.deleteById(id);
+                    HttpStatus.NOT_FOUND, new Error("Staff not existed").toString());
+        staff.get().setIsStopped(true);
+        staffRepository.save(staff.get());
     }
+
     public List<StaffEntity> findByName(String name) {
         return staffRepository.findByNameContainingIgnoreCase(name);
     }
