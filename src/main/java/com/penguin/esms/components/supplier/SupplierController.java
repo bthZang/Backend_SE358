@@ -5,6 +5,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.security.Principal;
+import java.util.Arrays;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "supplier")
@@ -25,8 +31,7 @@ public class SupplierController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
-        SupplierEntity supplier = service.remove(id);
-        return ResponseEntity.ok().build();
+    public void delete(@PathVariable String id) {
+        service.remove(id);
     }
 }
