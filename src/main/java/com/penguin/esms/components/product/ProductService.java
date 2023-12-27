@@ -49,18 +49,16 @@ public class ProductService {
         }
 
     public ProductEntity add(ProductDTO productDTO) {
-        if (productRepo.findByName(productDTO.getName()).isPresent())
+        Optional<ProductEntity> productOpt = productRepo.findByName(productDTO.getName());
+        if (productOpt.isPresent()) {
+            if (productOpt.get().getIsStopped() == true)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, new Error("Product has been discontinued ").toString());
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Product existed");
-        ProductEntity product = new ProductEntity();
-        mapper.updateProductFromDto(productDTO, product);
-        if (productDTO.getCategoryId() != null) {
-            Optional<CategoryEntity> category = categoryRepo.findById(productDTO.getCategoryId());
-            if (category.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Category not found");
-            }
-            product.setCategory(category.get());
+                    HttpStatus.BAD_REQUEST, new Error("Product existed").toString());
         }
+        ProductEntity product = updateFromDTO(productDTO, new ProductEntity());
+        product.setIsStopped(false);
         return productRepo.save(product);
     }
 
