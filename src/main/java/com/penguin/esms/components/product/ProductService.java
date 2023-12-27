@@ -62,13 +62,16 @@ public class ProductService {
         return productRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
 
-        public ProductEntity getProduct(String productId) {
-            Optional<ProductEntity> product = productRepo.findById(productId);
-            if (product.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-            }
-            return product.get();
+    public ProductEntity getProductById(String productId) {
+        Optional<ProductEntity> product = productRepo.findById(productId);
+        if (product.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Product not found").toString());
         }
+        if (product.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Product has been discontinued ");
+        return product.get();
+    }
 
     public ProductEntity add(ProductDTO productDTO) {
         Optional<ProductEntity> productOpt = productRepo.findByName(productDTO.getName());

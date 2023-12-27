@@ -33,7 +33,7 @@ public class ProductController {
 
     @GetMapping("{id}")
     public ProductEntity getProduct(@PathVariable String id) {
-        return service.getProduct(id);
+        return service.getProductById(id);
     }
 
     @PostMapping
