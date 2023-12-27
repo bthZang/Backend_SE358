@@ -17,8 +17,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
-
 @Service
 @Getter
 @Setter
@@ -29,16 +27,33 @@ public class ProductService {
     private final DTOtoEntityMapper mapper;
 
 
-    public List<ProductEntity> findByName(String name, String categoryName) {
-            if (categoryName != null && !categoryName.isEmpty()) {
-                Optional<CategoryEntity> optionalCategory = categoryRepo.findByName(categoryName);
-                if (optionalCategory.isEmpty()) {
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("category not found").toString());
-                }
-                return productRepo.findByNameContainingIgnoreCaseAndCategory(name, optionalCategory.get());
+    public List<ProductEntity> findRelatedCategory(String name, String categoryName) {
+        if (categoryName != null && !categoryName.isEmpty()) {
+            Optional<CategoryEntity> optionalCategory = categoryRepo.findByName(categoryName);
+            if (optionalCategory.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("category not found").toString());
             }
-            return productRepo.findByNameContainingIgnoreCase(name);
+            if (optionalCategory.get().getIsStopped() == true)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Category has been discontinued ");
+            return productRepo.findByNameContainingIgnoreCaseAndCategoryAndIsStopped(name, optionalCategory.get(), false);
         }
+        return productRepo.findByNameContainingIgnoreCaseAndIsStopped(name, false);
+    }
+
+    public List<ProductEntity> findDiscontinuedRelatedCategory(String name, String categoryName) {
+        if (categoryName != null && !categoryName.isEmpty()) {
+            Optional<CategoryEntity> optionalCategory = categoryRepo.findByName(categoryName);
+            if (optionalCategory.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("category not found").toString());
+            }
+            if (optionalCategory.get().getIsStopped() == true)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Category has been discontinued ");
+            return productRepo.findByNameContainingIgnoreCaseAndCategoryAndIsStopped(name, optionalCategory.get(), true);
+        }
+        return productRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
+    }
 
         public ProductEntity getProduct(String productId) {
             Optional<ProductEntity> product = productRepo.findById(productId);
