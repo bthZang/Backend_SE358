@@ -2,7 +2,10 @@ package com.penguin.esms.components.product;
 
 import com.penguin.esms.components.category.CategoryEntity;
 import com.penguin.esms.components.category.CategoryRepo;
+import com.penguin.esms.components.supplier.SupplierEntity;
+import com.penguin.esms.components.supplier.SupplierRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import com.penguin.esms.service.AmazonS3Service;
 import lombok.RequiredArgsConstructor;
 import com.penguin.esms.entity.Error;
 import lombok.Getter;
@@ -13,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +28,10 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepo productRepo;
     private final CategoryRepo categoryRepo;
+    private final SupplierRepo supplierRepo;
     private final DTOtoEntityMapper mapper;
+    private final AmazonS3Service amazonS3Service;
+
 
 
     public List<ProductEntity> findRelatedCategory(String name, String categoryName) {
@@ -76,12 +83,15 @@ public class ProductService {
         product.setIsStopped(false);
         return productRepo.save(product);
     }
-
-public ProductEntity update(ProductDTO productDTO, String id, MultipartFile photo) throws IOException {
-        if (productRepo.findById(id).isEmpty())
+    public ProductEntity update(ProductDTO productDTO, String id, MultipartFile photo) throws IOException {
+        Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
+        if (productEntityOptional.isEmpty())
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "Product not existed");
-        ProductEntity product = updateFromDTO(productDTO, productRepo.findById(id).get());
+        if (productEntityOptional.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Product has been discontinued ");
+        ProductEntity product = updateFromDTO(productDTO, productEntityOptional.get());
         if (photo != null) {
             List<String> parsedURL = Arrays.stream(product.getPhotoURL().split("/")).toList();
             amazonS3Service.deleteFile(parsedURL.get(parsedURL.size() - 1));
@@ -91,20 +101,37 @@ public ProductEntity update(ProductDTO productDTO, String id, MultipartFile phot
         return productRepo.save(product);
     }
 
-private ProductEntity updateFromDTO(ProductDTO productDTO, ProductEntity product) {
-    mapper.updateProductFromDto(productDTO, product);
-    if (productDTO.getCategoryId() != null) {
-        if (productDTO.getCategoryId().isEmpty()) {
-            product.setCategory(null);
-        } else {
-            Optional<CategoryEntity> category = categoryRepo.findById(productDTO.getCategoryId());
-            if (category.isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("Category not found").toString());
+    private ProductEntity updateFromDTO(ProductDTO productDTO, ProductEntity product) {
+        mapper.updateProductFromDto(productDTO, product);
+        if (productDTO.getCategoryId() != null) {
+            if (productDTO.getCategoryId().isEmpty()) {
+                product.setCategory(null);
+            } else {
+                Optional<CategoryEntity> category = categoryRepo.findById(productDTO.getCategoryId());
+                if (category.isEmpty()) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST, new Error("Category not found").toString());
+                }
+                product.setCategory(category.get());
+                if (category.get().getIsStopped() == true)
+                    throw new ResponseStatusException(
+                            HttpStatus.NOT_FOUND, "Category has been discontinued ");
+                product.setCategory(category.get());
             }
-            product.setCategory(category.get());
         }
+        List<SupplierEntity> supplierEntities = new ArrayList<>();
+        productDTO.getSuppliers().forEach(s -> {
+            Optional<SupplierEntity> supplier = supplierRepo.findById(s);
+            if (supplier.isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Supplier with ID: " + s + " not found.").toString());
+            }
+            if (supplier.get().getIsStopped())
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Supplier has been discontinued ");
+            supplierEntities.add(supplier.get());
+        });
+        product.setSuppliers(supplierEntities);
+        return product;
     }
-}
     public void remove(String id) {
         Optional<ProductEntity> productEntityOptional = productRepo.findById(id);
         if (productEntityOptional.isEmpty())
