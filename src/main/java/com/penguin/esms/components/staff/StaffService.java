@@ -44,9 +44,14 @@ public class StaffService {
         staffRepository.save(staff.get());
     }
 
-    public List<StaffEntity> findByName(String name) {
-        return staffRepository.findByNameContainingIgnoreCase(name);
+     public List<StaffEntity> findByName(String name) {
+        return staffRepository.findByNameContainingIgnoreCaseAndIsStopped(name, false);
     }
+
+    public List<StaffEntity> findResigned(String name) {
+        return staffRepository.findByNameContainingIgnoreCaseAndIsStopped(name, true);
+    }
+
     public StaffEntity getOne(String id) {
         Optional<StaffEntity> staff = staffRepository.findById(id);
         if (staff.isEmpty()) {
