@@ -17,13 +17,26 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SupplierController {
     private final SupplierService service;
-    @PostMapping
-    public ResponseEntity<?> post(@Valid SupplierDTO supplierDTO) {
-        return ResponseEntity.ok(service.add(supplierDTO));
-    }
-}
 
-    private final SupplierService service;
+    @GetMapping
+    public List<SupplierEntity> getAll(@RequestParam(defaultValue = "") String name) {
+        return service.findByName(name);
+    }
+
+    @GetMapping("termination")
+    public List<SupplierEntity> getAllTermination(@RequestParam(defaultValue = "") String name) {
+        return service.findTermination(name);
+    }
+    
+    @GetMapping("{id}")
+    public SupplierEntity getOne(@PathVariable String id) {
+        return service.getOne(id);
+    }
+
+    @PostMapping
+        public ResponseEntity<?> post(@Valid SupplierDTO supplierDTO) {
+            return ResponseEntity.ok(service.add(supplierDTO));
+    }
 
     @PutMapping("{id}")
     public ResponseEntity<?> put(@Valid com.penguin.esms.components.supplier.dto.SupplierDTO supplierDTO, @PathVariable String id) {
