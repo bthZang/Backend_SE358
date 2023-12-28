@@ -32,7 +32,10 @@ public class CategoryService {
         }
     }
     public List<CategoryEntity> getCategory(String name) {
-        return categoryRepo.findByNameContainingIgnoreCase(name);
+        return categoryRepo.findByNameContainingIgnoreCaseAndIsStopped(name, false);
+    }
+    public List<CategoryEntity> getDiscontinuedCategory(String name) {
+        return categoryRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
 
     public CategoryEntity postCategory(CategoryEntity categoryEntity) {

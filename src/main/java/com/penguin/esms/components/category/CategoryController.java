@@ -16,6 +16,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+    @GetMapping("discontinued")
+    public List<CategoryEntity> getALlDiscontinued(@RequestParam(defaultValue = "") String name) {
+        return categoryService.getDiscontinuedCategory(name);
+    }
 
     @GetMapping
     public List<CategoryEntity> getALl(@RequestParam(defaultValue = "") String name) {
