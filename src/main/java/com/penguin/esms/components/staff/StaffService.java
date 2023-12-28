@@ -19,6 +19,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class StaffService {
+    private final EntityManager entityManager;
     private final StaffRepository staffRepository;
     private final DTOtoEntityMapper mapper;
 
@@ -52,11 +53,14 @@ public class StaffService {
         return staffRepository.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
 
-    public StaffEntity getOne(String id) {
+        public StaffEntity getOne(String id) {
         Optional<StaffEntity> staff = staffRepository.findById(id);
         if (staff.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Staff not found");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Staff not existed").toString());
         }
+        if (staff.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, new Error("Staff has resigned").toString());
         return staff.get();
     }
 }
