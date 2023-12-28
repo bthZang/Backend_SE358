@@ -28,6 +28,17 @@ public class SupplierService {
         return supplierRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
 
+    public SupplierEntity getOne(String id) {
+        Optional<SupplierEntity> optionalSupplier = supplierRepo.findById(id);
+        if (optionalSupplier.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Supplier not found").toString());
+        }
+        if (optionalSupplier.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Supplier has terminated cooperation");
+        return optionalSupplier.get();
+    }
+
     public SupplierEntity add(SupplierDTO supplierDTO) {
         SupplierEntity supplier = new SupplierEntity();
         mapper.updateSupplierFromDto(supplierDTO, supplier);
