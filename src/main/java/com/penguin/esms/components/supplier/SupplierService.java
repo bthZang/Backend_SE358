@@ -20,12 +20,12 @@ public class SupplierService {
     private final SupplierRepo supplierRepo;
     private final DTOtoEntityMapper mapper;
 
-    public Optional<SupplierEntity> findById(String supplierId) {
-        return supplierRepo.findById(supplierId);
+    public List<SupplierEntity> findByName(String name) {
+        return supplierRepo.findByNameContainingIgnoreCaseAndIsStopped(name, false);
     }
 
-    public List<SupplierEntity> findByName(String name) {
-        return supplierRepo.findByNameContainingIgnoreCase(name);
+    public List<SupplierEntity> findTermination(String name) {
+        return supplierRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
 
     public SupplierEntity add(SupplierDTO supplierDTO) {
