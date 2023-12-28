@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepo extends JpaRepository<CategoryEntity, String> {
-    List<CategoryEntity> findByNameContainingIgnoreCase(String name);
     Optional<CategoryEntity> findByName(String name);
+    List<CategoryEntity> findByNameContainingIgnoreCaseAndIsStopped(String name, boolean isStopped);
+    Optional<CategoryEntity> findById(String id);
 }
