@@ -39,13 +39,22 @@ public class SupplierService {
         return optionalSupplier.get();
     }
 
-    public SupplierEntity add(SupplierDTO supplierDTO) {
+   public SupplierEntity add(SupplierDTO supplierDTO) {
+        Optional<SupplierEntity> supplierEntityOptional = supplierRepo.findByName(supplierDTO.getName());
+        if (supplierEntityOptional.isPresent()) {
+            if (supplierEntityOptional.get().getIsStopped() == true)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, new Error("Supplier has terminated cooperation ").toString());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, new Error("Supplier existed").toString());
+        }
         SupplierEntity supplier = new SupplierEntity();
         mapper.updateSupplierFromDto(supplierDTO, supplier);
         supplier.setNote(supplierDTO.getNote());
+        supplier.setIsStopped(false);
         return supplierRepo.save(supplier);
     }
-}
+
     public SupplierEntity update(SupplierDTO supplierDTO, String id) {
         Optional<SupplierEntity> optionalSupplier = supplierRepo.findById(id);
         if (optionalSupplier.isEmpty()) {
