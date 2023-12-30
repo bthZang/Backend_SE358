@@ -7,7 +7,7 @@ import com.penguin.esms.components.product.ProductEntity;
 import com.penguin.esms.components.staff.StaffDTO;
 import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.components.supplier.SupplierEntity;
-import com.penguin.esms.components.supplier.SupplierDTO;
+import com.penguin.esms.components.supplier.dto.SupplierDTO;
 import org.mapstruct.*;
 
 import java.util.List;
