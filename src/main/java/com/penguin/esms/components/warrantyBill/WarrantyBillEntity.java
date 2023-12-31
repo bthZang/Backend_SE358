@@ -3,11 +3,13 @@ package com.penguin.esms.components.warrantyBill;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.envers.Audited;
 
 import java.util.Date;
 
 @Entity
 @Table
+@Audited
 public class WarrantyBillEntity extends BaseEntity {
     private String staffId;
     private String customerId;

@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.penguin.esms.entity.NoteEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.envers.Audited;
 
 import java.security.PrivateKey;
 import java.util.Date;
 
 @Table
 @Entity
+@Audited
 public class ImportBillEntity extends NoteEntity {
     private String staffId;
     private String supplierId;

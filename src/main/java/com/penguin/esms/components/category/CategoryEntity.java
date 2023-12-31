@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import com.penguin.esms.components.product.ProductEntity;
+import org.hibernate.envers.Audited;
 
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Audited
 public class CategoryEntity extends BaseEntity {
     private String name;
     @JsonIgnoreProperties(value = {"category"})
