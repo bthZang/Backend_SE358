@@ -3,9 +3,11 @@ package com.penguin.esms.components.importProduct;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.envers.Audited;
 
 @Table
 @Entity
+@Audited
 public class ImportProductEntity extends BaseEntity {
     private String productId;
     private String staffId;

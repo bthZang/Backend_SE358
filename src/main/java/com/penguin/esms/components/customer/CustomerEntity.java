@@ -3,9 +3,11 @@ package com.penguin.esms.components.customer;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.envers.Audited;
 
 @Table
 @Entity
+@Audited
 public class CustomerEntity extends BaseEntity {
     private String name;
     private String phone;

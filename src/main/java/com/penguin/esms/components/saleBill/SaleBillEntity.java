@@ -3,11 +3,13 @@ package com.penguin.esms.components.saleBill;
 import com.penguin.esms.entity.NoteEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.envers.Audited;
 
 import java.util.Date;
 
 @Table
 @Entity
+@Audited
 public class SaleBillEntity extends NoteEntity {
     private String staffId;
     private String customerId;
