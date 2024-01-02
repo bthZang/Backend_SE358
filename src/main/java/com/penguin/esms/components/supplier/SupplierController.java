@@ -39,7 +39,7 @@ public class SupplierController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> put(@Valid com.penguin.esms.components.supplier.dto.SupplierDTO supplierDTO, @PathVariable String id) {
+    public ResponseEntity<?> put(@Valid SupplierDTO supplierDTO, @PathVariable String id) {
         return ResponseEntity.ok(service.update(supplierDTO, id));
     }
 
