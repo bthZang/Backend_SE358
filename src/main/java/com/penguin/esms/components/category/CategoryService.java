@@ -7,11 +7,13 @@ import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -26,8 +28,10 @@ import java.util.Optional;
 @Setter
 @RequiredArgsConstructor
 public class CategoryService {
+    @PersistenceContext
+    private final EntityManager entityManager;
+    private final AuditEnversInfoRepo auditEnversInfoRepo;
     private final CategoryRepo categoryRepo;
-
     private final DTOtoEntityMapper mapper;
 
     public CategoryEntity getCategoryById(String id) {
@@ -79,8 +83,32 @@ public class CategoryService {
         categoryRepo.save(categoryEntityOptional.get());
     }
 
+    @Transactional
     public List<?> getRevisionsForCategory(String id) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(CategoryEntity.class, true, true)
+                .add(AuditEntity.id().eq(id))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.property("name"))
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
         List<AuditEnversInfo> categoryAudit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for(int i=0; i< objects.size();i++){
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[2]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                CategoryEntity category = new CategoryEntity(id, (String) objArray[1]);
+                auditEnversInfo.setRevision(category);
+                categoryAudit.add(auditEnversInfo);
+            }
+        }
+        entityManager.close();
         return categoryAudit;
     }
 }
