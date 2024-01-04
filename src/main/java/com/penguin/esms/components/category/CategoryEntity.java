@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import com.penguin.esms.components.product.ProductEntity;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 
 
 import java.util.List;
@@ -24,9 +25,14 @@ import java.util.List;
 public class CategoryEntity extends BaseEntity {
     private String name;
     @JsonIgnoreProperties(value = {"category"})
+    @NotAudited
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     private List<ProductEntity> products;
 
+    public CategoryEntity(String id , String name) {
+        this.setId(id);
+        this.name = name;
+    }
     @Override
     public String toString() {
         return "CategoryEntity{" +
