@@ -6,7 +6,7 @@ import com.penguin.esms.components.importBill.ImportBillEntity;
 import com.penguin.esms.components.importBill.dto.ImportBillDTO;
 import com.penguin.esms.components.importProduct.ImportProductEntity;
 import com.penguin.esms.components.importProduct.dto.ImportProductDTO;
-import com.penguin.esms.components.product.ProductDTO;
+import com.penguin.esms.components.product.dto.ProductDTO;
 import com.penguin.esms.components.product.ProductEntity;
 import com.penguin.esms.components.staff.StaffDTO;
 import com.penguin.esms.components.staff.StaffEntity;

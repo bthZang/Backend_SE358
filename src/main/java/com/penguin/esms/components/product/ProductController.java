@@ -1,5 +1,6 @@
 package com.penguin.esms.components.product;
 
+import com.penguin.esms.components.product.dto.ProductDTO;
 import io.micrometer.common.lang.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,11 @@ public class ProductController {
     @GetMapping("{id}")
     public ProductEntity getProduct(@PathVariable String id) {
         return service.getProductById(id);
+    }
+
+    @GetMapping("history/{id}")
+    public List<?> getALlHistory(@PathVariable String id) {
+        return service.getRevisionsForProduct(id);
     }
 
     @PostMapping
