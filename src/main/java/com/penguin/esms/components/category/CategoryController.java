@@ -25,7 +25,10 @@ public class CategoryController {
     public List<CategoryEntity> getALl(@RequestParam(defaultValue = "") String name) {
         return categoryService.getCategory(name);
     }
-
+    @GetMapping("history/{id}")
+    public List<?> getALlHistory(@PathVariable String id) {
+        return categoryService.getRevisionsForCategory(id);
+    }
     @GetMapping("{id}")
     public CategoryEntity getItem(@PathVariable String id) {
         return categoryService.getCategoryById(id);

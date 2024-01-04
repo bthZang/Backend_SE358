@@ -2,14 +2,22 @@ package com.penguin.esms.components.category;
 
 import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.entity.Error;
+import com.penguin.esms.envers.AuditEnversInfo;
+import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,5 +77,10 @@ public class CategoryService {
                     HttpStatus.NOT_FOUND, "Category not existed");
         categoryEntityOptional.get().setIsStopped(true);
         categoryRepo.save(categoryEntityOptional.get());
+    }
+
+    public List<?> getRevisionsForCategory(String id) {
+        List<AuditEnversInfo> categoryAudit = new ArrayList<AuditEnversInfo>();
+        return categoryAudit;
     }
 }
