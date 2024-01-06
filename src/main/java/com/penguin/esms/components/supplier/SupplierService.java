@@ -17,6 +17,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class SupplierService {
+    private final EntityManager entityManager;
+    private final AuditEnversInfoRepo auditEnversInfoRepo;
     private final SupplierRepo supplierRepo;
     private final DTOtoEntityMapper mapper;
 
