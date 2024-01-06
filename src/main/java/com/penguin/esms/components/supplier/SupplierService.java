@@ -78,4 +78,35 @@ public class SupplierService {
         supplierEntityOptional.get().setIsStopped(true);
         supplierRepo.save(supplierEntityOptional.get());
     }
+
+    @Transactional
+    public List<?> getRevisions(String id) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(SupplierEntity.class, true, true)
+                .add(AuditEntity.id().eq(id))
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("name"))
+                .addProjection(AuditEntity.property("phone"))
+                .addProjection(AuditEntity.property("email"))
+                .addProjection(AuditEntity.property("address"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for(int i=0; i< objects.size();i++){
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                SupplierDTO dto = new SupplierDTO((String) objArray[1],  (String) objArray[2], (String) objArray[3], (String) objArray[4]);
+                auditEnversInfo.setRevision(dto);
+                audit.add(auditEnversInfo);
+            }
+        }
+        entityManager.close();
+        return audit;
+    }
 }
