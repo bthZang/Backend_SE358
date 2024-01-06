@@ -47,4 +47,9 @@ public class SupplierController {
     public void delete(@PathVariable String id) {
         service.remove(id);
     }
+
+    @GetMapping("history/{id}")
+    public List<?> getALlHistory(@PathVariable String id) {
+        return service.getRevisions(id);
+    }
 }
