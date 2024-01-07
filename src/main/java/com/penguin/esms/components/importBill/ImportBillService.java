@@ -67,6 +67,39 @@ public class ImportBillService {
     }
 
     @Transactional
+    public List<?> getRevisions(String id) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(ImportBillEntity.class, true, true)
+                .add(AuditEntity.id().eq(id))
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("supplierId"))
+                .addProjection(AuditEntity.property("paymentMethod"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for(int i=0; i< objects.size();i++){
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                ImportBillEntity entity = importBillRepo.findById((String) objArray[4]).get();
+                List<ImportProductEntity> importProducts = importProductRepo.findByImportBillId(entity.getId());
+                entity.setImportProducts(importProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.add(auditEnversInfo);
+            }
+        }
+        entityManager.close();
+        return audit;
+    }
+
+    @Transactional
     public List<?> getAll() {
         AuditReader auditReader = AuditReaderFactory.get(entityManager);
 
