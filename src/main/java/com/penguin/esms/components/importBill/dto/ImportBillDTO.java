@@ -18,4 +18,17 @@ public class ImportBillDTO {
     private String supplierId;
     private String paymentMethod;
     private List<ImportProductDTO> importProducts = new ArrayList<>();
+
+    public ImportBillDTO(String staffId, String supplierId, String paymentMethod) {
+        this.staffId = staffId;
+        this.supplierId = supplierId;
+        this.paymentMethod = paymentMethod;
+    }
+
+    public ImportBillDTO(String id, String staffId, String supplierId, String paymentMethod) {
+        this.setId(id);
+        this.staffId = staffId;
+        this.supplierId = supplierId;
+        this.paymentMethod = paymentMethod;
+    }
 }
