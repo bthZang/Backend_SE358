@@ -1,11 +1,14 @@
 package com.penguin.esms.components.customer;
 
 import com.penguin.esms.components.customer.dto.CustomerDTO;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -34,9 +37,16 @@ public class CustomerController {
     public ResponseEntity<?> post(@RequestBody CustomerDTO dto) {
         return ResponseEntity.ok(customerService.postCustomer(dto));
     }
+    @PutMapping("{id}")
+    public ResponseEntity<?> put(@RequestBody MultipartFile photo, @Valid CustomerDTO customerDTO, @PathVariable String id) throws IOException {
+        return ResponseEntity.ok(customerService.update(customerDTO, id));
+    }
     @DeleteMapping("{id}")
     public void remove(@PathVariable String id) {
         customerService.removeCustomer(id);
     }
-
+    @GetMapping("history/{id}")
+    public List<?> getALlHistory(@PathVariable String id) {
+        return customerService.getRevisions(id);
+    }
 }
