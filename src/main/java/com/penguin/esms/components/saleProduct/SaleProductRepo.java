@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface SaleProductRepo extends JpaRepository<SaleProductEntity,String> {
     Optional<SaleProductEntity> findById(String id);
+    List<SaleProductEntity> findBySaleBillId(String saleBillId);
 }

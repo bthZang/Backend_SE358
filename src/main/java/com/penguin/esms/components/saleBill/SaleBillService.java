@@ -9,12 +9,23 @@ import com.penguin.esms.components.saleProduct.SaleProductEntity;
 import com.penguin.esms.components.saleProduct.SaleProductRepo;
 import com.penguin.esms.components.saleProduct.dto.SaleProductDTO;
 import com.penguin.esms.components.staff.StaffEntity;
+import com.penguin.esms.envers.AuditEnversInfo;
+import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +34,9 @@ import java.util.Optional;
 @Getter
 @Setter
 public class SaleBillService {
+    @PersistenceContext
+    private final EntityManager entityManager;
+    private final AuditEnversInfoRepo auditEnversInfoRepo;
     private final SaleBillRepo saleBillRepo;
     private final SaleProductRepo saleProductRepo;
     private final DTOtoEntityMapper mapper;
@@ -59,4 +73,39 @@ public class SaleBillService {
         mapper.updateSaleProductFromDto(dto, entity);
         return entity;
     }
+
+    @Transactional
+    public List<?> getRevisions(String id) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(SaleBillEntity.class, true, true)
+                .add(AuditEntity.id().eq(id))
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("customer_id"))
+                .addProjection(AuditEntity.property("paymentMethod"))
+                .addProjection(AuditEntity.property("discount"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for (int i = 0; i < objects.size(); i++) {
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                SaleBillEntity entity = saleBillRepo.findById((String) objArray[5]).get();
+                List<SaleProductEntity> saleProducts =  saleProductRepo.findBySaleBillId(entity.getId());
+                entity.setSaleProducts(saleProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.add(auditEnversInfo);
+            }
+        }
+        entityManager.close();
+        return audit;
+    }
+
 }
