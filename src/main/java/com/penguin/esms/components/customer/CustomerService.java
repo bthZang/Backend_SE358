@@ -33,6 +33,14 @@ public class CustomerService {
         return customerRepo.findByPhone(phone).get();
     }
 
+    public List<CustomerEntity> getCustomer(String name, String phone) {
+        return customerRepo.findByNameContainingIgnoreCaseAndPhoneContainingIgnoreCaseAndIsStopped(name, phone, false);
+    }
+
+    public List<CustomerEntity> getBannedCustomer(String name) {
+        return customerRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
+    }
+
     public CustomerEntity postCustomer(CustomerDTO dto) {
         Optional<CustomerEntity> customerOp = customerRepo.findByPhone(dto.getPhone());
         if (customerOp.isPresent())

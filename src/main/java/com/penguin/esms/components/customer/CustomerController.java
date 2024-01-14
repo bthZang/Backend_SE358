@@ -6,11 +6,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "customer")
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+    @GetMapping
+    public List<CustomerEntity> getAll(@RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "") String phone) {
+        return customerService.getCustomer(name, phone);
+    }
+    @GetMapping("banned")
+    public List<CustomerEntity> getAllBanned(@RequestParam(defaultValue = "") String name) {
+        return customerService.getBannedCustomer(name);
+    }
     @GetMapping("{id}")
     public CustomerEntity getById(@PathVariable String id) {
         return customerService.getById(id);
