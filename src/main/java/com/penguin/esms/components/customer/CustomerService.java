@@ -29,6 +29,10 @@ public class CustomerService {
         return customer.get();
     }
 
+    public CustomerEntity getByPhone(String phone) {
+        return customerRepo.findByPhone(phone).get();
+    }
+
     public CustomerEntity postCustomer(CustomerDTO dto) {
         Optional<CustomerEntity> customerOp = customerRepo.findByPhone(dto.getPhone());
         if (customerOp.isPresent())
