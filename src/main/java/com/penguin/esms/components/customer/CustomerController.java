@@ -15,6 +15,10 @@ public class CustomerController {
     public CustomerEntity getById(@PathVariable String id) {
         return customerService.getById(id);
     }
+    @GetMapping("phone/{phone}")
+    public CustomerEntity getByPhone(@PathVariable String phone) {
+        return customerService.getByPhone(phone);
+    }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> post(@RequestBody CustomerDTO dto) {
