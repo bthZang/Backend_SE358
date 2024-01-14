@@ -24,10 +24,7 @@ import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +103,39 @@ public class SaleBillService {
         }
         entityManager.close();
         return audit;
+    }
+
+    @Transactional
+    public List<?> getAll() {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(SaleBillEntity.class, true, true)
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("customer_id"))
+                .addProjection(AuditEntity.property("paymentMethod"))
+                .addProjection(AuditEntity.property("discount"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        Map<String, AuditEnversInfo> audit = new HashMap<>();
+        List<Object[]> objects = query.getResultList();
+        for (int i = 0; i < objects.size(); i++) {
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                SaleBillEntity entity = saleBillRepo.findById((String) objArray[5]).get();
+                List<SaleProductEntity> saleProducts = saleProductRepo.findBySaleBillId(entity.getId());
+                entity.setSaleProducts(saleProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.put(entity.getId(), auditEnversInfo);
+            }
+        }
+        entityManager.close();
+        return Arrays.asList(audit.values().toArray());
     }
 
 }
