@@ -30,4 +30,8 @@ public class SaleBillController {
     public List<?> get(@PathVariable String id) {
         return saleBillService.getRevisions(id);
     }
+    @GetMapping()
+    public List<?> get() {
+        return saleBillService.getAll();
+    }
 }
