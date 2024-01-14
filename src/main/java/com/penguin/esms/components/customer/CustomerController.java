@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class CustomerController {
     private final CustomerService customerService;
+    @GetMapping("{id}")
+    public CustomerEntity getById(@PathVariable String id) {
+        return customerService.getById(id);
+    }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> post(@RequestBody CustomerDTO dto) {
