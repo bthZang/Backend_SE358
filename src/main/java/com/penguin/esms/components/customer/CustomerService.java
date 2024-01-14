@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -17,6 +18,16 @@ public class CustomerService {
     private final CustomerRepo customerRepo;
     private final DTOtoEntityMapper mapper;
 
+    public CustomerEntity getById(String id) {
+        Optional<CustomerEntity> customer = customerRepo.findById(id);
+        if (customer.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Customer not found").toString());
+        }
+        if (customer.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, new Error("Customer has been banned ").toString());
+        return customer.get();
+    }
 
     public CustomerEntity postCustomer(CustomerDTO dto) {
         Optional<CustomerEntity> customerOp = customerRepo.findByPhone(dto.getPhone());
