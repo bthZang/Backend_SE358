@@ -16,5 +16,9 @@ public class CustomerController {
     public ResponseEntity<?> post(@RequestBody CustomerDTO dto) {
         return ResponseEntity.ok(customerService.postCustomer(dto));
     }
+    @DeleteMapping("{id}")
+    public void remove(@PathVariable String id) {
+        customerService.removeCustomer(id);
+    }
 
 }
