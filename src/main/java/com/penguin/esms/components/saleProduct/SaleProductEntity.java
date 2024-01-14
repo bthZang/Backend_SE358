@@ -1,85 +1,37 @@
 package com.penguin.esms.components.saleProduct;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.penguin.esms.components.importBill.ImportBillEntity;
+import com.penguin.esms.components.product.ProductEntity;
+import com.penguin.esms.components.saleBill.SaleBillEntity;
 import com.penguin.esms.entity.BaseEntity;
+import com.penguin.esms.entity.NoteEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.hibernate.envers.Audited;
 
 @Entity
 @Table
-public class SaleProductEntity extends BaseEntity {
-    private String productId;
-    private String saleBillId;
+@Getter
+@Setter
+@RequiredArgsConstructor
+@Audited
+public class SaleProductEntity extends NoteEntity {
     private Integer quantity;
-    private Integer index;
     private Long price;
-    private String unit;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    @JsonIgnoreProperties(value = {"saleProducts"})
+    private ProductEntity product;
+    @ManyToOne
+    @JoinColumn(name = "saleBill_id")
+    @JsonIgnoreProperties(value = {"saleProducts"})
+    private SaleBillEntity saleBill;
 
-    public SaleProductEntity(String productId, String saleBillId, Integer quantity, Integer index, Long price, String unit) {
-        this.productId = productId;
-        this.saleBillId = saleBillId;
-        this.quantity = quantity;
-        this.index = index;
-        this.price = price;
-        this.unit = unit;
-    }
 
-    public String getProductId() {
-        return productId;
-    }
-
-    public void setProductId(String productId) {
-        this.productId = productId;
-    }
-
-    public String getSaleBillId() {
-        return saleBillId;
-    }
-
-    public void setSaleBillId(String saleBillId) {
-        this.saleBillId = saleBillId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getIndex() {
-        return index;
-    }
-
-    public void setIndex(Integer index) {
-        this.index = index;
-    }
-
-    public Long getPrice() {
-        return price;
-    }
-
-    public void setPrice(Long price) {
-        this.price = price;
-    }
-
-    public String getUnit() {
-        return unit;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    @Override
-    public String toString() {
-        return "SaleProductEntity{" +
-                "productId='" + productId + '\'' +
-                ", saleBillId='" + saleBillId + '\'' +
-                ", quantity=" + quantity +
-                ", index=" + index +
-                ", price=" + price +
-                ", unit='" + unit + '\'' +
-                '}';
-    }
 }
