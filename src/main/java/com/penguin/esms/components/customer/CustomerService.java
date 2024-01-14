@@ -30,6 +30,18 @@ public class CustomerService {
         return customerRepo.save(customer);
     }
 
+    public void removeCustomer(String id) {
+        Optional<CustomerEntity> customer = customerRepo.findById(id);
+        if (customer.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, new Error("Customer not existed").toString());
+        if (customer.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, new Error("Customer has been banned ").toString());
+        customer.get().setIsStopped(true);
+        customerRepo.save(customer.get());
+    }
+
     private CustomerEntity updateFromDTO(CustomerDTO customerDTO, CustomerEntity customer) {
         mapper.updateCustomerFromDto(customerDTO, customer);
         return customer;
