@@ -138,4 +138,43 @@ public class SaleBillService {
         return Arrays.asList(audit.values().toArray());
     }
 
+    @Transactional
+    public List<?> getAllRevisions(Date start, Date end) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(SaleBillEntity.class, true, true)
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("customer_id"))
+                .addProjection(AuditEntity.property("paymentMethod"))
+                .addProjection(AuditEntity.property("discount"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for (int i = 0; i < objects.size(); i++) {
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                SaleBillEntity entity = saleBillRepo.findById((String) objArray[5]).get();
+                List<SaleProductEntity> saleProducts =  saleProductRepo.findBySaleBillId(entity.getId());
+                entity.setSaleProducts(saleProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.add(auditEnversInfo);
+            }
+        }
+        Map<String, AuditEnversInfo> auditReturn = new HashMap<>();
+        for (int i = 0; i < audit.size(); i++) {
+            if (audit.get(i).getTimestamp() > start.getTime() && audit.get(i).getTimestamp() < end.getTime()) {
+                SaleBillEntity saleBillEntity = (SaleBillEntity) audit.get(i).getRevision();
+                auditReturn.put(saleBillEntity.getId(), audit.get(i));
+            }
+        }
+        entityManager.close();
+        return Arrays.asList(auditReturn.values().toArray());
+    }
 }
