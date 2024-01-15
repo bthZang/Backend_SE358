@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -33,5 +34,10 @@ public class SaleBillController {
     @GetMapping()
     public List<?> get() {
         return saleBillService.getAll();
+    }
+    @GetMapping("history")
+    public ResponseEntity<?> getAll(@RequestParam long start, @RequestParam long end) {
+        if (start == end) return ResponseEntity.ok(saleBillService.getAll());
+        return ResponseEntity.ok(saleBillService.getAllRevisions(new Date(start), new Date(end)));
     }
 }
