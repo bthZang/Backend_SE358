@@ -99,4 +99,35 @@ public class WarrantyBillService {
         }
         return audit;
     }
+
+
+    public List<?> getAll() {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(WarrantyBillEntity.class, true, true)
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("customer_id"))
+                .addProjection(AuditEntity.property("warrantyDate"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for(int i=0; i< objects.size();i++){
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                WarrantyBillEntity entity = warrantyBillRepo.findById((String) objArray[4]).get();
+                List<WarrantyProductEntity> warrantyProducts =  warrantyProductRepo.findByWarrantyBillId(entity.getId());
+                entity.setWarrantyProducts(warrantyProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.add(auditEnversInfo);
+            }
+        }
+        return audit;
+    }
 }
