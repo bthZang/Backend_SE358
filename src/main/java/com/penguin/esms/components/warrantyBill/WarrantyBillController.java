@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "warranty")
@@ -20,5 +21,10 @@ public class WarrantyBillController {
     public ResponseEntity<?> post(@RequestBody WarrantyBillDTO dto, Principal connectedUser) {
         StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
         return ResponseEntity.ok(warrantyBillService.postWarrantyBill(dto,staff));
+    }
+
+    @GetMapping("{id}")
+    public List<?> get(@PathVariable String id) {
+        return warrantyBillService.getRevisions(id);
     }
 }
