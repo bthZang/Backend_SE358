@@ -18,6 +18,10 @@ import com.penguin.esms.components.staff.StaffDTO;
 import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.components.supplier.SupplierEntity;
 import com.penguin.esms.components.supplier.dto.SupplierDTO;
+import com.penguin.esms.components.warrantyBill.WarrantyBillEntity;
+import com.penguin.esms.components.warrantyBill.dto.WarrantyBillDTO;
+import com.penguin.esms.components.warrantyProduct.WarrantyProductEntity;
+import com.penguin.esms.components.warrantyProduct.dto.WarrantyProductDTO;
 import org.mapstruct.*;
 
 import java.util.List;
@@ -45,6 +49,10 @@ public interface DTOtoEntityMapper {
     void updateSaleBillFromDto(SaleBillDTO dto, @MappingTarget SaleBillEntity entity);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateSaleProductFromDto(SaleProductDTO dto, @MappingTarget SaleProductEntity entity);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateWarrantyBillFromDto(WarrantyBillDTO dto, @MappingTarget WarrantyBillEntity entity);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateWarrantyProductFromDto(WarrantyProductDTO dto, @MappingTarget WarrantyProductEntity entity);
     default List<SupplierEntity> map(List<String> value) {
         return value.stream().map(v -> new SupplierEntity()).toList();
     }
