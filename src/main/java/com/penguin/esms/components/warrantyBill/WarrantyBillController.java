@@ -27,4 +27,8 @@ public class WarrantyBillController {
     public List<?> get(@PathVariable String id) {
         return warrantyBillService.getRevisions(id);
     }
+    @GetMapping()
+    public List<?> get() {
+        return warrantyBillService.getAll();
+    }
 }
