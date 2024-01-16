@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.penguin.esms.components.saleBill.SaleBillEntity;
 import com.penguin.esms.components.staff.validators.PhoneNumberFormat;
+import com.penguin.esms.components.warrantyBill.WarrantyBillEntity;
 import com.penguin.esms.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -26,6 +27,12 @@ public class CustomerEntity extends BaseEntity {
     @PhoneNumberFormat(message = "Invalid phone number")
     private String phone;
     private String address;
+    @JsonIgnoreProperties(value = {"warrantyBill"})
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
+//    @NotAudited
+    @JsonIgnore
+    private List<WarrantyBillEntity> warrantyBills;
+
     @JsonIgnoreProperties(value = {"saleBill"})
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "customer")
 //    @NotAudited
