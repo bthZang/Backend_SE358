@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @NoArgsConstructor
 public class CustomerDTO {
     private String name;
