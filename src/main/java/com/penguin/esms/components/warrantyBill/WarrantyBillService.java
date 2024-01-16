@@ -23,6 +23,7 @@ import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -130,4 +131,40 @@ public class WarrantyBillService {
         }
         return audit;
     }
+    public List<?> getAllRevisions(Date start, Date end) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(WarrantyBillEntity.class, true, true)
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("customer_id"))
+                .addProjection(AuditEntity.property("warrantyDate"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for(int i=0; i< objects.size();i++){
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                WarrantyBillEntity entity = warrantyBillRepo.findById((String) objArray[4]).get();
+                List<WarrantyProductEntity> warrantyProducts =  warrantyProductRepo.findByWarrantyBillId(entity.getId());
+                entity.setWarrantyProducts(warrantyProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.add(auditEnversInfo);
+            }
+        }
+        List<AuditEnversInfo> auditReturn = new ArrayList<AuditEnversInfo>();
+        for(int i=0; i< audit.size();i++){
+            if (audit.get(i).getTimestamp() > start.getTime() && audit.get(i).getTimestamp() < end.getTime() ) {
+                auditReturn.add(audit.get(i));
+            }
+        }
+        return auditReturn;
+    }
+
 }
