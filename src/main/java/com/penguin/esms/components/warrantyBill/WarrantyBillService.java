@@ -9,12 +9,20 @@ import com.penguin.esms.components.warrantyBill.dto.WarrantyBillDTO;
 import com.penguin.esms.components.warrantyProduct.WarrantyProductEntity;
 import com.penguin.esms.components.warrantyProduct.WarrantyProductRepo;
 import com.penguin.esms.components.warrantyProduct.dto.WarrantyProductDTO;
+import com.penguin.esms.envers.AuditEnversInfo;
+import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import jakarta.persistence.EntityManager;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,6 +31,8 @@ import java.util.Optional;
 @Getter
 @Setter
 public class WarrantyBillService {
+    private final EntityManager entityManager;
+    private final AuditEnversInfoRepo auditEnversInfoRepo;
     private final WarrantyBillRepo warrantyBillRepo;
     private final WarrantyProductRepo warrantyProductRepo;
     private final DTOtoEntityMapper mapper;
@@ -58,5 +68,35 @@ public class WarrantyBillService {
     private WarrantyProductEntity updateFromDTO(WarrantyProductDTO dto, WarrantyProductEntity entity) {
         mapper.updateWarrantyProductFromDto(dto, entity);
         return entity;
+    }
+    public List<?> getRevisions(String id) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(WarrantyBillEntity.class, true, true)
+                .add(AuditEntity.id().eq(id))
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("staffId"))
+                .addProjection(AuditEntity.property("customer_id"))
+                .addProjection(AuditEntity.property("warrantyDate"))
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for(int i=0; i< objects.size();i++){
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                WarrantyBillEntity entity = warrantyBillRepo.findById((String) objArray[4]).get();
+                List<WarrantyProductEntity> warrantyProducts =  warrantyProductRepo.findByWarrantyBillId(entity.getId());
+                entity.setWarrantyProducts(warrantyProducts);
+                auditEnversInfo.setRevision(entity);
+                audit.add(auditEnversInfo);
+            }
+        }
+        return audit;
     }
 }
