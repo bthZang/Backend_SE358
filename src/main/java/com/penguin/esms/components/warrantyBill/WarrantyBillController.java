@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -30,5 +31,10 @@ public class WarrantyBillController {
     @GetMapping()
     public List<?> get() {
         return warrantyBillService.getAll();
+    }
+    @GetMapping("history")
+    public ResponseEntity<?> getAll(@RequestParam long start, @RequestParam long end) {
+        if (start == end) return ResponseEntity.ok(warrantyBillService.getAll());
+        return ResponseEntity.ok(warrantyBillService.getAllRevisions(new Date(start), new Date(end)));
     }
 }
