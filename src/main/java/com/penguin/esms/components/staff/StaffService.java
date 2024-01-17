@@ -41,9 +41,29 @@ public class StaffService {
         }
         StaffEntity staff = updateFromDTO(dto, new StaffEntity());
         staff.setIsStopped(false);
-        String password = staff.getEmail();
-        staff.setPassword(passwordEncoder.encode(password));
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        String password = random(10, characters);
+        staff.setPassword(passwordEncoder.encode(password));        staff.setPassword(passwordEncoder.encode(password));
         return staffRepository.save(staff);
+    }
+    public void changePassword(String oldPassword, String newPassword, Principal connectedUser) throws Exception {
+        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        Optional<StaffEntity> optional = staffRepository.findById(staff.getId());
+        if (optional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Staff has not been existed").toString());
+        }
+        try {
+            if (optional.get().getIsStopped() == true)
+                throw new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, new Error("Staff has resigned").toString());
+        } catch (NullPointerException e) {
+        }
+        if (!passwordEncoder.matches(oldPassword, optional.get().getPassword())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, new Error("Password not true").toString());
+        }
+        optional.get().setPassword(passwordEncoder.encode(newPassword));
+        staffRepository.save(optional.get());
     }
     private StaffEntity updateFromDTO(StaffDTO dto, StaffEntity staff) {
         mapper.updateStaffFromDto(dto, staff);
