@@ -1,9 +1,15 @@
 package com.penguin.esms.components.staff;
 
 import com.penguin.esms.entity.Error;
+import com.penguin.esms.envers.AuditEnversInfo;
+import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
+import org.hibernate.envers.query.AuditQuery;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +29,8 @@ import static com.penguin.esms.utils.Random.random;
 @Service
 @RequiredArgsConstructor
 public class StaffService {
+    private final EntityManager entityManager;
+    private final AuditEnversInfoRepo auditEnversInfoRepo;
     private final StaffRepository staffRepository;
     private final DTOtoEntityMapper mapper;
     private final PasswordEncoder passwordEncoder;
@@ -43,7 +51,7 @@ public class StaffService {
         staff.setIsStopped(false);
         String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
         String password = random(10, characters);
-        staff.setPassword(passwordEncoder.encode(password));        staff.setPassword(passwordEncoder.encode(password));
+        staff.setPassword(passwordEncoder.encode(password));
         return staffRepository.save(staff);
     }
     public void changePassword(String oldPassword, String newPassword, Principal connectedUser) throws Exception {
@@ -69,13 +77,16 @@ public class StaffService {
         mapper.updateStaffFromDto(dto, staff);
         return staff;
     }
-    public StaffEntity update(StaffDTO staffDTO, String id){
-        StaffEntity staff = staffRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Staff not existed"
-                ));
-        mapper.updateStaffFromDto(staffDTO, staff);
-        return staffRepository.save(staff);
+    public StaffEntity update(StaffDTO dto, String id) throws IOException {
+        Optional<StaffEntity> optional = staffRepository.findByCitizenId(dto.getCitizenId());
+        if (optional.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Staff not existed").toString());
+        }
+        if (optional.get().getIsStopped() == true)
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, new Error("Staff has resigned").toString());
+        StaffEntity staffEntity = updateFromDTO(dto, staffRepository.findById(id).get());
+        return staffRepository.save(staffEntity);
     }
 
     public void remove(String id) {
@@ -91,6 +102,10 @@ public class StaffService {
         return staffRepository.findByNameContainingIgnoreCaseAndIsStopped(name, false);
     }
 
+    public StaffEntity findByMail(String email) {
+        return staffRepository.findByEmail(email).get();
+    }
+
     public List<StaffEntity> findResigned(String name) {
         return staffRepository.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
@@ -104,5 +119,36 @@ public class StaffService {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, new Error("Staff has resigned").toString());
         return staff.get();
+    }
+
+    public List<?> getRevisionsForStaff(String id) {
+        AuditReader auditReader = AuditReaderFactory.get(entityManager);
+
+        AuditQuery query = auditReader.createQuery()
+                .forRevisionsOfEntity(StaffEntity.class, true, true)
+                .add(AuditEntity.id().eq(id))
+                .addProjection(AuditEntity.revisionNumber())
+                .addProjection(AuditEntity.property("id"))
+                .addProjection(AuditEntity.property("name"))
+                .addProjection(AuditEntity.property("phone"))
+                .addProjection(AuditEntity.property("email"))
+                .addProjection(AuditEntity.property("citizenId"))
+                .addProjection(AuditEntity.property("role"))
+                .addProjection(AuditEntity.revisionType())
+                .addOrder(AuditEntity.revisionNumber().desc());
+
+        List<AuditEnversInfo> staffAudit = new ArrayList<AuditEnversInfo>();
+        List<Object[]> objects = query.getResultList();
+        for (int i = 0; i < objects.size(); i++) {
+            Object[] objArray = objects.get(i);
+            Optional<AuditEnversInfo> auditEnversInfoOptional = auditEnversInfoRepo.findById((int) objArray[0]);
+            if (auditEnversInfoOptional.isPresent()) {
+                AuditEnversInfo auditEnversInfo = auditEnversInfoOptional.get();
+                StaffDTO staff = new StaffDTO(id, (String) objArray[2], (String) objArray[3], (String) objArray[4], (String) objArray[5], (Role) objArray[6]);
+                auditEnversInfo.setRevision(staff);
+                staffAudit.add(auditEnversInfo);
+            }
+        }
+        return staffAudit;
     }
 }

@@ -1,5 +1,5 @@
 package com.penguin.esms.components.staff;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.penguin.esms.components.permission.PermissionEntity;
 import com.penguin.esms.components.staff.validators.PhoneNumberFormat;
 import com.penguin.esms.entity.BaseEntity;
@@ -11,6 +11,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
+import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -25,7 +26,7 @@ import java.util.List;
 @Entity
 @Table
 @Audited
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+//@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class StaffEntity extends BaseEntity implements UserDetails {
     @Pattern(regexp = "^[a-z0-9A-Z_àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹýÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ ]*$", message = "Name should not contain special characters")
     @NotNull
@@ -38,16 +39,17 @@ public class StaffEntity extends BaseEntity implements UserDetails {
     @Email(message = "Invalid email address format")
     private String email;
     @Column(unique = true)
-    @Size.List({
-            @Size(min = 12, max = 12, message = "Citizen ID must be 12 characters long")
-    })
+    @Pattern(regexp = "^(\\d{9}|\\d{12})$", message = "Citizen ID must be 9 or 12 digits")
     private String citizenId;
+    private String photoURL;
     @Enumerated(EnumType.STRING)
     private Role role;
+    @NotAudited
     private Date lastOnline = null;
-
+    @NotAudited
+    @JsonIgnore
     @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JsonIgnoreProperties(value = {"staff"})
+//    @JsonIgnoreProperties(value = {"staff"})
     private List<PermissionEntity> permissions = new ArrayList<>();
 
     public StaffEntity() {}
