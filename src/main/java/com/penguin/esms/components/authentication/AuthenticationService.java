@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +58,7 @@ public class AuthenticationService {
         var refreshToken = jwtService.generateRefreshToken(user);
         revokeAllUserTokens(user);
         saveUserToken(user, jwtToken);
+        user.setLastOnline(new Date());
         repository.save(user);
         return AuthenticationResponse.builder()
                 .accessToken(jwtToken)
@@ -98,7 +100,7 @@ public class AuthenticationService {
         refreshToken = authHeader.substring(7);
         userEmail = jwtService.extractUsername(refreshToken);
         if (userEmail != null) {
-            var user = this.repository.findByEmail(userEmail)
+            var user = repository.findByEmail(userEmail)
                     .orElseThrow();
             if (jwtService.isTokenValid(refreshToken, user)) {
                 var accessToken = jwtService.generateToken(user);
