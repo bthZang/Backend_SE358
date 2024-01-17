@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface AuditEnversInfoRepo extends JpaRepository<AuditEnversInfo, Integer> {
     Optional<AuditEnversInfo> findById(int id);
+    List<AuditEnversInfo> findByUsername(String username);
 }
