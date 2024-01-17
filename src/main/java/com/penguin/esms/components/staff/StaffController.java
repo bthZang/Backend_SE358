@@ -69,6 +69,10 @@ public class StaffController {
     public ResponseEntity<?>  edit(@RequestBody StaffDTO staffDTO, @PathVariable String id) {
         return ResponseEntity.ok(staffService.update(staffDTO, id));
     }
+    @PutMapping(path = "changePassword")
+    public void changePass(@RequestParam String oldPassword, @RequestParam String newPassword, Principal connectedUser) throws Exception {
+        staffService.changePassword(oldPassword, newPassword, connectedUser);
+    }
     @DeleteMapping(path = "{id}")
     public void delete(@PathVariable String id) {
         staffService.remove(id);
