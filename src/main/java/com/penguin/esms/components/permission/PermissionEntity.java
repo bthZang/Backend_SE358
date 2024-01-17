@@ -1,5 +1,6 @@
 package com.penguin.esms.components.permission;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.entity.BaseEntity;
 import com.penguin.esms.entity.NoteEntity;
@@ -19,7 +20,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table
-@Audited
+//@Audited
 @RequiredArgsConstructor
 public class PermissionEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
@@ -27,9 +28,10 @@ public class PermissionEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private EntityType entityType;
     private String entityId;
-    @NotAudited
-    @ManyToOne(cascade = CascadeType.ALL)
+
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "staff_id")
+    @JsonIgnoreProperties(value = {"permissions"})
     @NotNull
     private StaffEntity staff;
 
