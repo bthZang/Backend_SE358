@@ -4,18 +4,16 @@ import com.penguin.esms.components.staff.validators.PhoneNumberFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.Constraint;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+//import org.checkerframework.common.aliasing.qual.Unique;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class StaffDTO {
     @Pattern(regexp = "^[a-z0-9A-Z_àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹýÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ ]*$", message = "Name should not contain special characters")
@@ -23,8 +21,8 @@ public class StaffDTO {
     private String name;
     @PhoneNumberFormat(message = "Invalid phone number")
     private String phone;
-    @Size(min = 1, message = "Password must be at least 1 characters long")
-    private String password;
+//    @Size(min = 1, message = "Password must be at least 1 characters long")
+//    private String password;
     @Email(message = "Invalid email address format")
     private String email;
     @Size.List({
@@ -32,4 +30,5 @@ public class StaffDTO {
     })
     private String citizenId;
     private Role role;
+    private String photoURL;
 }

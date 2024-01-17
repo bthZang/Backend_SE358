@@ -1,6 +1,8 @@
 package com.penguin.esms.components.staff;
 
 import com.penguin.esms.components.staff.requests.NewStaffRequest;
+import com.penguin.esms.service.AmazonS3Service;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -8,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
@@ -22,7 +25,17 @@ public class StaffController {
 
     private final StaffRepository staffRepository;
     private final StaffService staffService;
+    private final AmazonS3Service amazonS3Service;
 
+    @PostMapping("")
+    public ResponseEntity<?> postStaff(@RequestParam @Nullable MultipartFile photo, StaffDTO dto) throws Exception {
+        if (photo != null){
+            String objectURL = amazonS3Service.addFile(photo, dto.getName() + "_" + photo.getOriginalFilename());
+            dto.setPhotoURL(objectURL);
+        }
+
+        return ResponseEntity.ok(staffService.addStaff(dto));
+    }
     @GetMapping("profile")
     public ResponseEntity<?> getStaffProfile(Principal connectedUser) {
         StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
