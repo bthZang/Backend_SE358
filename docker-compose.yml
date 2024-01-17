@@ -11,7 +11,7 @@ services:
     networks:
       - postgresql
     volumes:
-      - postgresql-volume:/var/lib/postgres
+      - postgresql-volume:/var/lib/postgresql/data
 
   web:
     build: .
@@ -23,8 +23,12 @@ services:
       - db
     networks:
       - postgresql
+    volumes:
+      - /root/.aws/credentials:/home/web/.aws:ro
+      - /root/.aws/credentials:/root/.aws:ro
 
 networks:
   postgresql:
 volumes:
   postgresql-volume:
+    external: true
