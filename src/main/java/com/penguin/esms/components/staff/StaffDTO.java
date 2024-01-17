@@ -16,6 +16,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 public class StaffDTO {
+    private String id;
     @Pattern(regexp = "^[a-z0-9A-Z_àáãạảăắằẳẵặâấầẩẫậèéẹẻẽêềếểễệđìíĩỉịòóõọỏôốồổỗộơớờởỡợùúũụủưứừửữựỳỵỷỹýÀÁÃẠẢĂẮẰẲẴẶÂẤẦẨẪẬÈÉẸẺẼÊỀẾỂỄỆĐÌÍĨỈỊÒÓÕỌỎÔỐỒỔỖỘƠỚỜỞỠỢÙÚŨỤỦƯỨỪỬỮỰỲỴỶỸÝ ]*$", message = "Name should not contain special characters")
     @NotNull
     private String name;
@@ -31,4 +32,13 @@ public class StaffDTO {
     private String citizenId;
     private Role role;
     private String photoURL;
+
+    public StaffDTO(String id, String name, String phone, String email, String citizenId, Role role) {
+        this.setId(id);
+        this.name = name;
+        this.phone = phone;
+        this.email = email;
+        this.citizenId = citizenId;
+        this.role = role;
+    }
 }
