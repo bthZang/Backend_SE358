@@ -8,7 +8,7 @@ import com.penguin.esms.components.supplier.SupplierRepo;
 import com.penguin.esms.envers.AuditEnversInfo;
 import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
-import com.penguin.esms.service.AmazonS3Service;
+import com.penguin.esms.services.AmazonS3Service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;

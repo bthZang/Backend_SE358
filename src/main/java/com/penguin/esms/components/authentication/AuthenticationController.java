@@ -1,5 +1,8 @@
 package com.penguin.esms.components.authentication;
 
+import com.penguin.esms.components.authentication.requests.AuthenticationRequest;
+import com.penguin.esms.components.authentication.requests.RegisterRequest;
+import com.penguin.esms.components.authentication.responses.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

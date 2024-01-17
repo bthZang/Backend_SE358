@@ -1,4 +1,4 @@
-package com.penguin.esms.service;
+package com.penguin.esms.services;
 
 import com.penguin.esms.utils.AwsS3Client;
 import org.springframework.beans.factory.annotation.Value;
