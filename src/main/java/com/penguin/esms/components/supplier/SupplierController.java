@@ -1,9 +1,16 @@
 package com.penguin.esms.components.supplier;
 
+import com.penguin.esms.components.permission.EntityType;
+import com.penguin.esms.components.permission.PermissionEntity;
+import com.penguin.esms.components.permission.PermissionRepo;
+import com.penguin.esms.components.permission.dto.ItemPermission;
+import com.penguin.esms.components.staff.Role;
+import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.components.supplier.dto.SupplierDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SupplierController {
     private final SupplierService service;
+    private final PermissionRepo permissionRepo;
 
     @GetMapping
     public List<SupplierEntity> getAll(@RequestParam(defaultValue = "") String name) {
@@ -48,6 +56,13 @@ public class SupplierController {
         service.remove(id);
     }
 
+    @GetMapping("permission/{id}")
+    public ResponseEntity<?> listPermission(Principal connectedUser, @PathVariable String id) {
+        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        if (staff.getRole() == Role.ADMIN) return ResponseEntity.ok(new ItemPermission(true, true, true));
+        List<PermissionEntity> permissions = permissionRepo.findByEntityTypeAndEntityIdAndStaffId(EntityType.PRODUCT, id, staff.getId());
+        return ResponseEntity.ok(new ItemPermission(permissions));
+    }
     @GetMapping("history/{id}")
     public List<?> getALlHistory(@PathVariable String id) {
         return service.getRevisions(id);
