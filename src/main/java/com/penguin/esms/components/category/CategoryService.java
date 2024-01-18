@@ -1,10 +1,10 @@
 package com.penguin.esms.components.category;
 
-import com.penguin.esms.components.staff.StaffEntity;
 import com.penguin.esms.entity.Error;
 import com.penguin.esms.envers.AuditEnversInfo;
 import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import com.penguin.esms.utils.Random;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -49,7 +49,11 @@ public class CategoryService {
     public List<CategoryEntity> getDiscontinuedCategory(String name) {
         return categoryRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
     }
-
+    public CategoryEntity random() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String name = Random.random(10, characters);
+        return new CategoryEntity(name);
+    }
     public CategoryEntity postCategory(CategoryEntity categoryEntity) {
         Optional<CategoryEntity> categoryEntityOptional = categoryRepo.findByName(categoryEntity.getName());
         if (categoryEntityOptional.isPresent()) {
@@ -65,11 +69,11 @@ public class CategoryService {
 
 
     public CategoryEntity editCategory(CategoryDTO categoryDTO, String id) {
-        CategoryEntity category = categoryRepo.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "Category not existed"
-                ));
-
+        Optional<CategoryEntity> categoryEntityOptional = categoryRepo.findById(id);
+        if (categoryEntityOptional.isEmpty())
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "Category not existed");
+        CategoryEntity category = categoryEntityOptional.get();
         mapper.updateCategoryFromDto(categoryDTO, category);
         return categoryRepo.save(category);
     }
