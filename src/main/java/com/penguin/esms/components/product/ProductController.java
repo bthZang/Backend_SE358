@@ -1,7 +1,8 @@
 package com.penguin.esms.components.product;
 
 import com.penguin.esms.components.product.dto.ProductDTO;
-import io.micrometer.common.lang.Nullable;
+import com.penguin.esms.services.AmazonS3Service;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,6 +24,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService service;
+    private final AmazonS3Service amazonS3Service;
 
     @GetMapping
     public List<ProductEntity> getAll(@RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "") String category) {
@@ -43,7 +46,19 @@ public class ProductController {
     }
 
     @PostMapping
-    public ResponseEntity<?> postProduct(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<?> postProduct(@RequestParam @Nullable List<MultipartFile> photo, @Valid ProductDTO productDTO) throws IOException {
+        if (photo != null) {
+            List<String> photoURLs = new ArrayList<>();
+            photo.forEach(multipartFile -> {
+                try {
+                    String objectURL = amazonS3Service.addFile(multipartFile, productDTO.getName() + "_" + multipartFile.getOriginalFilename());
+                    photoURLs.add(objectURL);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            productDTO.setPhotoURL(String.join(";", photoURLs));
+        }
         return ResponseEntity.ok(service.add(productDTO));
     }
 
