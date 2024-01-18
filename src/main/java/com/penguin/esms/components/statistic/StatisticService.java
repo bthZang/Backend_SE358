@@ -2,7 +2,12 @@ package com.penguin.esms.components.statistic;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.penguin.esms.components.category.CategoryEntity;
+import com.penguin.esms.components.saleBill.SaleBillEntity;
+import com.penguin.esms.components.saleBill.SaleBillService;
+import com.penguin.esms.components.saleProduct.SaleProductEntity;
 import com.penguin.esms.components.statistic.dto.StatisticDTO;
+import com.penguin.esms.envers.AuditEnversInfo;
 import com.penguin.esms.utils.TimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +18,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class StatisticService {
     private final StatisticRepository repo;
+    private final SaleBillService saleBillService;
 
     public StatisticEntity add(String name, Object object) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -57,5 +63,30 @@ public class StatisticService {
         return dto;
     }
 
+    public List<?> revenueByCategory(Date start, Date end) throws JsonProcessingException {
+        StatisticDTO dto = new StatisticDTO();
+        Map<String, StatisticDTO> map = new HashMap<>();
+        List<AuditEnversInfo> auditEnversInfoList = (List<AuditEnversInfo>) saleBillService.getAllRevisions(start, end);
+        for (AuditEnversInfo i : auditEnversInfoList) {
+            SaleBillEntity saleBill = (SaleBillEntity) i.getRevision();
+            for (SaleProductEntity t : saleBill.getSaleProducts()) {
+                try {
+                    CategoryEntity category = t.getProduct().getCategory();
+                    dto = map.get(category.getName());
+                    if (dto == null) {
+                        dto = new StatisticDTO();
+                        dto.setName(category.getName());
+                        dto.setRevenue(0L);
+                        dto.setQuantity(0);
+                    }
+                    dto.setQuantity(dto.getQuantity() + t.getQuantity());
+                    dto.setRevenue(dto.getRevenue() + t.getQuantity() * t.getPrice());
+                    map.put(category.getName(), dto);
+                } catch (NullPointerException e) {
+                }
+            }
+        }
+        return Arrays.asList(map.entrySet().toArray());
+    }
 
 }
