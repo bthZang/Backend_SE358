@@ -1,6 +1,8 @@
 package com.penguin.esms.components.statistic;
 
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.penguin.esms.components.category.CategoryEntity;
 import com.penguin.esms.components.saleBill.SaleBillEntity;
@@ -60,6 +62,24 @@ public class StatisticService {
         } catch (NoSuchElementException s) {
         }
 
+        return dto;
+    }
+
+    public StatisticDTO revenueByPeriod(Date start, Date end) throws JsonProcessingException {
+        StatisticDTO dto = new StatisticDTO(null, 0l, 0l, 0);
+        Map<String, StatisticDTO> map = new HashMap<>();
+        List<AuditEnversInfo> auditEnversInfoList = (List<AuditEnversInfo>) saleBillService.getAllRevisions(start, end);
+        for (AuditEnversInfo i : auditEnversInfoList) {
+            SaleBillEntity saleBill = (SaleBillEntity) i.getRevision();
+            for (SaleProductEntity t : saleBill.getSaleProducts()) {
+                try {
+                    dto.setQuantity(dto.getQuantity() + t.getQuantity());
+                    dto.setRevenue(dto.getRevenue() + t.getPrice() * t.getQuantity());
+                } catch (NullPointerException e) {
+                }
+            }
+        }
+        add("revenueByPeriod" + TimeUtils.getDay(start) + TimeUtils.getDay(end), dto);
         return dto;
     }
 
