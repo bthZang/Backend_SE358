@@ -41,5 +41,21 @@ public class StatisticService {
         return dto;
     }
 
+    public StatisticDTO getRevenueDate(Date date) throws JsonProcessingException {
+        Long i = TimeUtils.getDay(date);
+        StatisticDTO dto = new StatisticDTO(null, 0l, 0l, 0);
+        Map<String, StatisticDTO> map = new HashMap<>();
+        Optional<StatisticEntity> statisticEntityOptional = repo.findByName("revenueByDate" + i);
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            StatisticDTO statistic = objectMapper.readValue(statisticEntityOptional.get().getData(), StatisticDTO.class);
+            dto.setQuantity(dto.getQuantity() + statistic.getQuantity());
+            dto.setRevenue(dto.getRevenue() + statistic.getRevenue());
+        } catch (NoSuchElementException s) {
+        }
+
+        return dto;
+    }
+
 
 }
