@@ -51,6 +51,19 @@ public class ProductEntity extends BaseEntity {
     @Column(length=4069)
     private String photoURL;
 
+    public ProductEntity(String id , String name, CategoryEntity category, String unit, Long price, Integer quantity, Integer warrantyPeriod, Boolean isAvailable, String photoURL, String specifications){
+        this.setId(id);
+        this.name = name;
+        this.category = category;
+        this.unit = unit;
+        this.price = price;
+        this.quantity = quantity;
+        this.warrantyPeriod = warrantyPeriod;
+        this.isAvailable = isAvailable;
+        this.photoURL = photoURL;
+        this.specifications = specifications;
+    }
+
     @JsonIgnoreProperties(value = {"importProducts"})
     @NotAudited
     @JsonIgnore
