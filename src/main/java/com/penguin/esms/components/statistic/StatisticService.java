@@ -5,6 +5,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.penguin.esms.components.category.CategoryEntity;
+import com.penguin.esms.components.importBill.ImportBillEntity;
+import com.penguin.esms.components.importBill.ImportBillService;
+import com.penguin.esms.components.importProduct.ImportProductEntity;
 import com.penguin.esms.components.saleBill.SaleBillEntity;
 import com.penguin.esms.components.saleBill.SaleBillService;
 import com.penguin.esms.components.saleProduct.SaleProductEntity;
@@ -21,6 +24,8 @@ import java.util.*;
 public class StatisticService {
     private final StatisticRepository repo;
     private final SaleBillService saleBillService;
+    private final ImportBillService importBillService;
+
 
     public StatisticEntity add(String name, Object object) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -108,5 +113,20 @@ public class StatisticService {
         }
         return Arrays.asList(map.entrySet().toArray());
     }
-
+    public StatisticDTO costByPeriod(Date start, Date end) throws JsonProcessingException {
+        StatisticDTO dto = new StatisticDTO(null, 0l, 0l, 0);
+        List<AuditEnversInfo> auditEnversInfoList = (List<AuditEnversInfo>) importBillService.getAllRevisions(start, end);
+        for (AuditEnversInfo i : auditEnversInfoList) {
+            ImportBillEntity importBill = (ImportBillEntity) i.getRevision();
+            for (ImportProductEntity t : importBill.getImportProducts()) {
+                try {
+                    dto.setQuantity(dto.getQuantity() + t.getQuantity());
+                    dto.setCost(dto.getCost() + t.getPrice() * t.getQuantity());
+                } catch (NullPointerException e) {
+                }
+            }
+        }
+        add("costByPeriod" + TimeUtils.getDay(start) + TimeUtils.getDay(end), dto);
+        return dto;
+    }
 }
