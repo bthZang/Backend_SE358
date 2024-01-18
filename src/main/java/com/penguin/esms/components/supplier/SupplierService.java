@@ -3,6 +3,7 @@ package com.penguin.esms.components.supplier;
 import com.penguin.esms.components.supplier.dto.SupplierDTO;
 import com.penguin.esms.envers.AuditEnversInfo;
 import com.penguin.esms.envers.AuditEnversInfoRepo;
+import com.penguin.esms.utils.Random;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.hibernate.envers.AuditReader;
@@ -50,7 +51,16 @@ public class SupplierService {
         return optionalSupplier.get();
     }
 
-   public SupplierEntity add(SupplierDTO supplierDTO) {
+    public static SupplierDTO random() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+        String name = Random.random(10, characters);
+        String phone = "09" + Random.random(8, numbers);
+        String email = Random.random(5, characters) + Random.random(5, numbers) + "@gmail.com";
+        String address = Random.random(10, characters);
+        return new SupplierDTO(name, phone, email, address);
+    }
+    public SupplierEntity add(SupplierDTO supplierDTO) {
         Optional<SupplierEntity> supplierEntityOptional = supplierRepo.findByName(supplierDTO.getName());
         if (supplierEntityOptional.isPresent()) {
             if (supplierEntityOptional.get().getIsStopped() == true)
