@@ -11,6 +11,7 @@ import lombok.Setter;
 @Setter
 public class SaleProductDTO {
     private String productId;
+    private String seri;
     private Integer quantity;
     private Long price;
 
