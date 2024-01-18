@@ -10,4 +10,9 @@ import org.springframework.web.bind.annotation.*;
 public class StatisticController {
     private final StatisticService service;
 
+    @GetMapping("name/{name}")
+    public StatisticEntity getName(@PathVariable String name) {
+        return service.getByName(name);
+    }
+
 }
