@@ -21,7 +21,7 @@ public class StatisticController {
 
     @GetMapping("revenue")
     public ResponseEntity<?> getRevenueByPeriod(@RequestParam long start, @RequestParam long end) throws JsonProcessingException {
-        return ResponseEntity.ok(service.getRevenuePeriod(new Date(start), new Date(end)));
+        return ResponseEntity.ok(service.revenueByPeriod(new Date(start), new Date(end)));
     }
 
     @GetMapping("category")
@@ -32,5 +32,4 @@ public class StatisticController {
     public ResponseEntity<?> getRevenueByDate(@RequestParam long date) throws JsonProcessingException {
         return ResponseEntity.ok(service.getRevenueDate(new Date(date)));
     }
-
 }
