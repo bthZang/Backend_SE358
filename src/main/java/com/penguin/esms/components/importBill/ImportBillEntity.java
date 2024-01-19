@@ -25,6 +25,19 @@ public class ImportBillEntity extends NoteEntity {
     private String staffId;
     private String supplierId;
     private String paymentMethod;
+
+    public ImportBillEntity(String staffId, String supplierId, String paymentMethod) {
+        this.staffId = staffId;
+        this.supplierId = supplierId;
+        this.paymentMethod = paymentMethod;
+    }
+
+    public ImportBillEntity(String id, String staffId, String supplierId, String paymentMethod) {
+        this.setId(id);
+        this.staffId = staffId;
+        this.supplierId = supplierId;
+        this.paymentMethod = paymentMethod;
+    }
     @JsonIgnoreProperties(value = {"import_bill"})
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "importBill")
     private List<ImportProductEntity> importProducts;
