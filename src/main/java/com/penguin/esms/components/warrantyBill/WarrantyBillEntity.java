@@ -33,4 +33,16 @@ public class WarrantyBillEntity extends NoteEntity {
     @JsonIgnoreProperties(value = {"warrantyBills"})
     private CustomerEntity customer;
 
+    public WarrantyBillEntity(String staffId, CustomerEntity customer, Date warrantyDate) {
+        this.staffId = staffId;
+        this.setCustomer(customer);
+        this.warrantyDate = warrantyDate;
+    }
+    public WarrantyBillEntity(String staffId, CustomerEntity customer, Date warrantyDate, String id ) {
+        this.staffId = staffId;
+        this.setCustomer(customer);
+        this.warrantyDate = warrantyDate;
+        this.setId(id);
+    }
+
 }
