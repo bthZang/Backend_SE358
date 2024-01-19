@@ -20,4 +20,23 @@ public class WarrantyBillDTO {
     private String customerId;
     private Date warrantyDate;
     private List<WarrantyProductDTO> warrantyProducts = new ArrayList<>();
+
+    public WarrantyBillDTO(String staffId, String customerId, Date warrantyDate) {
+        this.staffId = staffId;
+        this.customerId = customerId;
+        this.warrantyDate = warrantyDate;
+    }
+
+    public WarrantyBillDTO(String staffId, String customerId, Date warrantyDate, String id) {
+        this.staffId = staffId;
+        this.customerId = customerId;
+        this.warrantyDate = warrantyDate;
+        this.setId(id);
+    }
+
+    public WarrantyBillDTO(String customerId, List<WarrantyProductDTO> warrantyProducts) {
+        this.customerId = customerId;
+//        this.warrantyDate = warrantyDate;
+        this.warrantyProducts = warrantyProducts;
+    }
 }
