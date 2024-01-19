@@ -1,9 +1,11 @@
 package com.penguin.esms.components.importBill;
 
 import com.penguin.esms.components.importBill.dto.ImportBillDTO;
+import com.penguin.esms.components.staff.StaffEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -27,7 +29,8 @@ public class ImportBillController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> post(@RequestBody ImportBillDTO importBillDTO, Principal connectedUser) {
-        return ResponseEntity.ok(importBillService.postImportBill(importBillDTO, connectedUser));
+        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+        return ResponseEntity.ok(importBillService.postImportBill(importBillDTO, staff));
     }
     @GetMapping("history")
     public ResponseEntity<?> getAll(@RequestParam long start, @RequestParam long end) {
