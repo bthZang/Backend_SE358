@@ -31,4 +31,23 @@ public class SaleBillEntity extends NoteEntity {
     @JoinColumn(name = "customer_id")
     @JsonIgnoreProperties(value = {"saleBills"})
     private CustomerEntity customer;
+
+    public SaleBillEntity(String staffId, String paymentMethod, Float discount) {
+        this.staffId = staffId;
+        this.paymentMethod = paymentMethod;
+        this.discount =discount;
+    }
+    public SaleBillEntity(String staffId, CustomerEntity customer, String paymentMethod, Float discount) {
+        this.staffId = staffId;
+        this.setCustomer(customer);
+        this.paymentMethod = paymentMethod;
+        this.discount = discount;
+    }
+    public SaleBillEntity(String staffId, CustomerEntity customer, String paymentMethod, Float discount,String id ) {
+        this.staffId = staffId;
+        this.setCustomer(customer);
+        this.paymentMethod = paymentMethod;
+        this.discount = discount;
+        this.setId(id);
+    }
 }
