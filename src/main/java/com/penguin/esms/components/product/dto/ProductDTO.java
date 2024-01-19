@@ -39,4 +39,16 @@ public class ProductDTO {
         this.photoURL = photoURL;
         this.specifications = specifications;
     }
+
+    public ProductDTO(String name, String categoryId, String unit, Long price, Integer quantity, Integer warrantyPeriod, Boolean isAvailable, String photoURL, String specifications){
+        this.name = name;
+        this.categoryId = categoryId;
+        this.unit = unit;
+        this.price = price;
+        this.quantity = quantity;
+        this.warrantyPeriod = warrantyPeriod;
+        this.isAvailable = isAvailable;
+        this.photoURL = photoURL;
+        this.specifications = specifications;
+    }
 }

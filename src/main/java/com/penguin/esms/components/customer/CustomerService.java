@@ -5,6 +5,7 @@ import com.penguin.esms.entity.Error;
 import com.penguin.esms.envers.AuditEnversInfo;
 import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import com.penguin.esms.utils.Random;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.envers.AuditReader;
@@ -49,6 +50,14 @@ public class CustomerService {
 
     public List<CustomerEntity> getBannedCustomer(String name) {
         return customerRepo.findByNameContainingIgnoreCaseAndIsStopped(name, true);
+    }
+    public static CustomerDTO random() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+        String name = Random.random(10, characters);
+        String phone = "09" + Random.random(8, numbers);
+        String address = Random.random(10, characters);
+        return new CustomerDTO(name, phone, address);
     }
 
     public CustomerEntity postCustomer(CustomerDTO dto) {

@@ -3,13 +3,19 @@ package com.penguin.esms.components.importBill;
 import com.penguin.esms.components.importBill.dto.ImportBillDTO;
 import com.penguin.esms.components.importProduct.ImportProductEntity;
 import com.penguin.esms.components.importProduct.ImportProductRepo;
+import com.penguin.esms.components.importProduct.ImportProductService;
 import com.penguin.esms.components.importProduct.dto.ImportProductDTO;
 import com.penguin.esms.components.product.ProductEntity;
 import com.penguin.esms.components.product.ProductRepo;
 import com.penguin.esms.components.staff.StaffEntity;
+import com.penguin.esms.components.supplier.SupplierEntity;
+import com.penguin.esms.components.supplier.SupplierService;
+import com.penguin.esms.components.supplier.dto.SupplierDTO;
+import com.penguin.esms.entity.Error;
 import com.penguin.esms.envers.AuditEnversInfo;
 import com.penguin.esms.envers.AuditEnversInfoRepo;
 import com.penguin.esms.mapper.DTOtoEntityMapper;
+import com.penguin.esms.utils.Random;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
@@ -18,8 +24,10 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 import java.util.*;
@@ -34,9 +42,33 @@ public class ImportBillService {
     private final ProductRepo productRepo;
     private final DTOtoEntityMapper mapper;
     private final ImportProductRepo importProductRepo;
+    private final ImportProductService importProductService;
+    private final SupplierService supplierService;
 
-    public ImportBillEntity postImportBill(ImportBillDTO importBillDTO, Principal connectedUser) {
-        StaffEntity staff = (StaffEntity) ((UsernamePasswordAuthenticationToken) connectedUser).getPrincipal();
+
+
+    public ImportBillEntity getImportBill(String importBillId) {
+        Optional<ImportBillEntity> importBill = importBillRepo.findById(importBillId);
+        if (importBill.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, new Error("Import bill not found").toString());
+        }
+        return importBill.get();
+    }
+
+    public ImportBillDTO random() {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        String numbers = "0123456789";
+        List<ImportProductDTO> importProductDTOS = new ArrayList<>();
+        for(int i=0; i<=3;i++){
+            importProductDTOS.add(importProductService.random());
+        }
+        SupplierDTO supplierDTO = supplierService.random();
+        SupplierEntity supplierEntity = supplierService.add(supplierDTO);
+        String supplierId = supplierEntity.getId();
+        String paymentMethod = Random.random(10, characters);
+        return new ImportBillDTO(supplierId, paymentMethod, importProductDTOS);
+    }
+    public ImportBillEntity postImportBill(ImportBillDTO importBillDTO, StaffEntity staff) {
         importBillDTO.setStaffId(staff.getId());
         List<ImportProductDTO> importPrts = importBillDTO.getImportProducts();
         ImportBillEntity impot = updateFromDTO(importBillDTO, new ImportBillEntity());
@@ -111,7 +143,7 @@ public class ImportBillService {
                 .addProjection(AuditEntity.revisionType())
                 .addOrder(AuditEntity.revisionNumber().desc());
 
-        List<AuditEnversInfo> audit = new ArrayList<AuditEnversInfo>();
+        Map<String, AuditEnversInfo> audit = new HashMap<>();
         List<Object[]> objects = query.getResultList();
         for(int i=0; i< objects.size();i++){
             Object[] objArray = objects.get(i);
@@ -122,11 +154,11 @@ public class ImportBillService {
                 List<ImportProductEntity> importProducts = importProductRepo.findByImportBillId(entity.getId());
                 entity.setImportProducts(importProducts);
                 auditEnversInfo.setRevision(entity);
-                audit.add(auditEnversInfo);
+                audit.put(entity.getId(), auditEnversInfo);
             }
         }
         entityManager.close();
-        return audit;
+        return Arrays.asList(audit.values().toArray());
     }
 
     @Transactional

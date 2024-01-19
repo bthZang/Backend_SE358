@@ -3,6 +3,8 @@ package com.penguin.esms.components.authentication.requests;
 import com.penguin.esms.components.staff.Role;
 import lombok.*;
 
+@Getter
+@Setter
 @Data
 @Builder
 @AllArgsConstructor
